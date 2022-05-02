@@ -1,7 +1,8 @@
 #include "LoRaWan_APP.h"
 #include "Arduino.h"
 #include <CayenneLPP.h>//the library is needed ��https://github.com/ElectronicCats/CayenneLPP��
-#include "settings.h"
+
+float vBat; // battery voltage
 
 /*
  * set LoraWan_RGB to Active,the RGB active in loraWan
@@ -11,6 +12,16 @@
  * RGB yellow means RxWindow2;
  * RGB green means received done;
  */
+
+/* OTAA para*/
+uint8_t devEui[] = { 0x22, 0x32, 0x33, 0x00, 0x00, 0x88, 0x88, 0x02 };
+uint8_t appEui[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+uint8_t appKey[] = { 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x66, 0x01 };
+
+/* ABP para*/
+uint8_t nwkSKey[] = { 0xBF,  0x6B, 0x7C, 0xDA, 0x0D, 0x0D, 0x32, 0xB8, 0x3A, 0xC0, 0x65, 0xC8, 0x11, 0x38, 0x81, 0x09 };
+uint8_t appSKey[] = { 0xA2,  0xD1, 0xA1, 0x54, 0x5C, 0x95, 0x26, 0xB3, 0x63, 0x8B, 0xA5, 0x6D, 0x0B, 0x05, 0xD0, 0x1D };
+uint32_t devAddr =  ( uint32_t )0x260B954D;
 
 /*LoraWan channelsmask, default channels 0-7*/ 
 uint16_t userChannelsMask[6]={ 0x00FF,0x0000,0x0000,0x0000,0x0000,0x0000 };
@@ -22,7 +33,7 @@ LoRaMacRegion_t loraWanRegion = ACTIVE_REGION;
 DeviceClass_t  loraWanClass = LORAWAN_CLASS;
 
 /*the application data transmission duty cycle.  value in [ms].*/
-uint32_t appTxDutyCycle = TransmitPeriod;
+uint32_t appTxDutyCycle = 600000;
 
 /*OTAA or ABP*/
 bool overTheAirActivation = LORAWAN_NETMODE;
@@ -70,47 +81,41 @@ static void prepareTxFrame( uint8_t port )
 	*for example, if use REGION_CN470, 
 	*the max value for different DR can be found in MaxPayloadOfDatarateCN470 refer to DataratesCN470 and BandwidthsCN470 in "RegionCN470.h".
 	*/
+    vBat = getBatteryVoltage()/1000;
+    Serial.print("Battery voltage: ");
+    Serial.print(vBat);
+    Serial.println("V");  
     CayenneLPP lpp(LORAWAN_APP_DATA_MAX_SIZE);
-    lpp.addDigitalInput(1,FlowMeterPulses); 
+    lpp.addAnalogInput(1,vBat);
+    lpp.addAnalogInput(2, 1.23f);
+    lpp.addGPS(3, -12.34f, 45.56f, 9.01f);
     lpp.getBuffer(), 
     appDataSize = lpp.getSize();
     memcpy(appData,lpp.getBuffer(),appDataSize);
-}
-
-/* Read the sensor */
-void flow () // Interrupt function
-{
-  FlowMeterPulses++;
-  Serial.println (FlowMeterPulses);
+    Serial.print(appDataSize);
+    Serial.println(F(" bytes long LPP packet queued."));    
 }
 
 void setup() {
-	boardInitMcu();
 	Serial.begin(115200);
-  #if(AT_SUPPORT)
-  	enableAt();
-  #endif
+#if(AT_SUPPORT)
+	enableAt();
+#endif
 	deviceState = DEVICE_STATE_INIT;
 	LoRaWAN.ifskipjoin();
-
-  /* Initialize the sensor port */
-  pinMode(flowsensor, INPUT);
-  //digitalWrite(flowsensor, HIGH); // Optional Internal Pull-Up
-  attachInterrupt(flowsensor, flow, RISING); // CubeCell boar version
-  //attachInterrupt(digitalPinToInterrupt(flowsensor), flow, RISING); // Arduino board version
 }
 
-void loop()
-{
-
-  /* Application port */
+void loop(){
 	switch( deviceState )
 	{
 		case DEVICE_STATE_INIT:
 		{
-      #if(AT_SUPPORT)
-      			getDevParam();
-      #endif
+#if(LORAWAN_DEVEUI_AUTO)
+			LoRaWAN.generateDeveuiByChipID();
+#endif
+#if(AT_SUPPORT)
+			getDevParam();
+#endif
 			printDevParam();
 			LoRaWAN.init(loraWanClass,loraWanRegion);
 			deviceState = DEVICE_STATE_JOIN;
@@ -128,7 +133,6 @@ void loop()
 			prepareTxFrame( appPort );
 			LoRaWAN.send();
 			deviceState = DEVICE_STATE_CYCLE;
-      FlowMeterPulses = 0; // Reset Counter
       Serial.println ('Send');
 			break;
 		}
