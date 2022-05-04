@@ -38,5 +38,6 @@ Lo para poder programar adecuadamente el dispositivo tendremos que configurar el
 1. Añadir la URL https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.4.0/package_CubeCell_index.json a Preferences->Settings->Additional boards:
 2. 
 
-
+## Agradecimientos
+https://learn.sparkfun.com/tutorials/sik-experiment-guide-for-the-arduino-101genuino-101-board-spanish/experimento-15-usar-la-placa-de-detector-de-sonido
 
