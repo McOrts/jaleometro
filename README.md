@@ -23,7 +23,7 @@ Podremos encontrar toda la documentación de esta placa en: https://resource.hel
 
 - [Batería de polímero de litio de 3,7V y conector PH2.0](https://es.aliexpress.com/item/4000288987647.html)
 
-<img src="./img/boardAB01.png" width="500" align="center" />
+<img src="./img/Battery_LiPo37Vph2.png" width="500" align="center" />
 
 - [Panel solar de 6V](https://es.aliexpress.com/item/4001128543657.html)
 
@@ -32,6 +32,10 @@ Podremos encontrar toda la documentación de esta placa en: https://resource.hel
 - [Carcasa hermética IP66](https://es.aliexpress.com/item/33060319519.html)
 
 <img src="./img/IP66_case.png" width="300" align="center" />
+
+## Conexionado
+
+<img src="./img/cubecell_htcc-ab01_pinout.png"  align="center" />
 
 ## Configuración IDE Arduino
 Lo para poder programar adecuadamente el dispositivo tendremos que configurar el entorno de programación de Arduino con las configuraciones de hardware y librerias de esta placa.
