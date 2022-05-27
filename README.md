@@ -19,7 +19,7 @@ Por otra parte se van a utilizar comunicaciones de largo alcance tipo LPWAN (Low
   - Certificación CE y FCC
 
 <img src="./img/boardAB01.png" width="500" align="center" />
-Podremos encontrar toda la documentación de esta placa en: https://resource.heltec.cn/download/CubeCell
+Podremos encontrar toda la documentación de esta placa en: [Documentos y ficheros](https://resource.heltec.cn/download/CubeCell), [FAQs](https://github.com/HelTecAutomation/HeltecDocs/blob/master/en/source/cubecell/frequently_asked_questions.md) 
 
 - [Batería de polímero de litio de 3,7V y conector PH2.0](https://es.aliexpress.com/item/4000288987647.html)
 
