@@ -32,11 +32,11 @@ Podremos encontrar toda la documentación de esta placa en: [Documentos y ficher
 
 - [SparkFun Sound Detector](https://www.sparkfun.com/products/14262)
 
-<img src="./img/IP66_case.png" width="300" align="center" />
+<img src="./img/SparkFun_SoundDetector.jpeg" width="300" align="center" />
 
 - [Carcasa hermética IP66](https://es.aliexpress.com/item/33060319519.html)
 
-<img src="./img/SparkFun_SoundDetector.jpeg" width="300" align="center" />
+<img src="./img/IP66_case.png" width="300" align="center" />
 
 ## Conexionado
 
