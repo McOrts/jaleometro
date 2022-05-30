@@ -22,7 +22,7 @@ Por otra parte se van a utilizar comunicaciones de largo alcance tipo LPWAN (Low
 
 Podremos encontrar toda la documentación de esta placa en: [Documentos y ficheros](https://resource.heltec.cn/download/CubeCell), [FAQs](https://github.com/HelTecAutomation/HeltecDocs/blob/master/en/source/cubecell/frequently_asked_questions.md) 
 
-- [Batería de polímero de litio de 3,7V y conector PH2.0](https://es.aliexpress.com/item/4000288987647.html)
+- [Batería de polímero de litio de 3,7V y conector JST SH1.0 de 1,0mm y dos pines](https://es.aliexpress.com/item/4000288987647.html)
 
 <img src="./img/Battery_LiPo37Vph2.png" width="500" align="center" />
 
@@ -30,13 +30,23 @@ Podremos encontrar toda la documentación de esta placa en: [Documentos y ficher
 
 <img src="./img/SolarPanel.png" width="300" align="center" />
 
-- [Carcasa hermética IP66](https://es.aliexpress.com/item/33060319519.html)
+- [SparkFun Sound Detector](https://www.sparkfun.com/products/14262)
 
 <img src="./img/IP66_case.png" width="300" align="center" />
 
+- [Carcasa hermética IP66](https://es.aliexpress.com/item/33060319519.html)
+
+<img src="./img/SparkFun_SoundDetector.jpeg" width="300" align="center" />
+
 ## Conexionado
 
+Del microcontrolador CubeCell sólo vamos a utilizar el pin 2 que corresponde al único conversor analógico/digital de la placa. Intermante es el mismo que utiliza para ver el estado de carga de la bateria. Por lo que perderemos esta función.  
+
 <img src="./img/cubecell_htcc-ab01_pinout.png"  align="center" />
+
+Otro detalle a tener en cuenta respecto a la alimentación del sensor de sonido, es que aunque sería recomendable utilizar una tensió de 5V que suministraria la placa por el pin VIN. Este sólo tiene tensión cuando se alimenta por USB. Por lo que tendremos que utilizar el pin VDD que suministra 3.3 en la configuración de bateria y son suficientes para que el sensor funciones correctamente.
+
+<img src="./img/jaleometro_bb.png"  align="center" />
 
 ## Configuración IDE Arduino
 Lo para poder programar adecuadamente el dispositivo tendremos que configurar el entorno de programación de Arduino con las configuraciones de hardware y librerias de esta placa.
