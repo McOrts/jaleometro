@@ -38,6 +38,10 @@ Podremos encontrar toda la documentación de esta placa en: [Documentos y ficher
 
 <img src="./img/IP66_case.png" width="300" align="center" />
 
+Por otra parte también se necesitarán otros componentes no electrónicos como cables, mini-protoboard... lo que conforma este kit:
+
+<img src="./img/jaleometro_kit.jpg" align="center" />
+
 ## Conexionado
 
 Del microcontrolador CubeCell sólo vamos a utilizar el pin 2 que corresponde al único conversor analógico/digital de la placa. Intermante es el mismo que utiliza para ver el estado de carga de la bateria. Por lo que perderemos esta función.  
@@ -52,6 +56,83 @@ Otro detalle a tener en cuenta respecto a la alimentación del sensor de sonido,
 Lo para poder programar adecuadamente el dispositivo tendremos que configurar el entorno de programación de Arduino con las configuraciones de hardware y librerias de esta placa.
 1. Añadir la URL https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.4.0/package_CubeCell_index.json a Preferences->Settings->Additional boards:
 2. 
+
+## Configuración del sensor en la nube (TTN)
+
+Vamos a utilizar los servicios de The Things Network que es un servicio en la nube al que están conectados los _gateway_ libres de la las Comunidades TTN. 
+La ruta de la información es la siguiente:
+1. El sensor (_nodo_) transmite por radio con modulación LoRa el trama de datos que recibe el _gateway_
+2. Este _gateway_ está conectado a internet para retransmitir la trama, hora como paquete de datos.
+3. Los servidores de TTN decodifican el mensaje y ofrecen diferentes intefraciones y _endpoints_ para que nuestras aplicaciones utilicen la información leida por los sensores.
+
+Hay muchas variantes para implementar este enrutamiento. Para este se ha eleguido estas configuraciones:
+- Dispositivo es del tipo ABP (Activation-by-personalisation) lo que significa que se identificará en la red con un _DevAddr_ y una _Session key_ preconfigurada. Para ello tenemos que completar el registro de una aplicación y un dispositivo. 
+- Publicación del paquete de-codificado en una cola MQTT a la que nuestra aplicación está subscrita.
+
+<img src="./images/TTN_p1.jpg" width="400" align="left" />
+
+Estos son los pasos a seguir empezando por acceder a la aplicación _back-end_ de TTN en esta URL: https://console.cloud.thethings.network/ en la que seleccionaremos nuestra región y luego nos loguearemos con nuestro usuario registrado.
+
+
+### Registro de la aplicación
+Los dispositivos como este sensor se comunican con la aplicación en la que han sido registrados. Para registras un dispositivo, primero hay que añadir una aplicación.
+
+<img src="./images/TTN_p2.jpg" width="400" align="left" />
+<img src="./images/TTN_p3.jpg" width="400" align="right" />
+
+En el formulario de alta de aplicación rellenaremos estos campos: 
+- Para el _Application ID_, elige un identificador único, en minúsculas, puedes usar caracteres alfanuméricos peor no guiones ´-´ consecutivos.
+- Para  _Description_, elige la descripcion que prefieras.
+- No hace falta poner nada en _Application EUI_ 
+- Presiona _Create application_ para finalizar
+
+<img src="./images/TTN_p4.jpg" width="400" align="center" />
+
+
+Ahora seremos redirigidos a la página con la nueva aplicación añadida donde puedes encontrar la _app EUI_ y el _Access Keys_ generados.
+<br>
+<img src="./images/ttn-application.png" width="600" align="center" />
+
+### Registro del dispositivo
+
+<img src="./images/ttn-add-device.png" width="400" align="right" />
+
+En TTN un dispositivo (devide) representa la configuración de lo que también llama nodo (node) que a fin de cuentas es nuestro circuito. 
+Al acceder al formulario de registro, únicamente tenemos que rellenar el _Device ID_ que será el nombre único de este nodo. Es preferible pulsar el icono marcado en la imagen para que se genere automáticamente el _Device EUI_.
+
+<img src="./images/ttn-add-device_params.png" width="400" align="left" />
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+Finalmente pulsaremos _Register_ y pulsaremos el icono con el nombre de nuestro nuevo dispositivo para ver sus datos de configuración. Aquí encontraremos los parámetros que necesitamos por ser un dispositivo de tipo ABP. Y que tendremos que pasar al fichero de configuración settings.h que se cargará en el _sketch_ del IDE de Arduino.
+Pero el formato para las Keys es diferente. Encontrarás aquí una hoja excel (Encode_EUI.xlsx) que te facilitará esta tarea.
+
+```
+// TTN Configuration
+// LoRaWAN NwkSKey, network session key provided by TTN Console (https://console.thethingsnetwork.org) in Device settings form:
+static const PROGMEM u1_t NWKSKEY[16] = {0x8F,0xDA,......};
+// LoRaWAN AppSKey, application session key provided by TTN Console (https://console.thethingsnetwork.org) in Device settings form:
+static const u1_t PROGMEM APPSKEY[16] = {0xE5,0x0A,......};
+// LoRaWAN end-device address (DevAddr)
+static const u4_t DEVADDR = 0x12345678 ; // <-- Change this address for every node!
+
+// Other params
+const int update_time_alive = 150000;
+const int PhotoCell = 2; 
+const int Buzzer = 15;
+```
+
+### Formato de la trama
+<img src="./images/ttn-add-payload_format.png" width="400" align="right" />
+
+Tendremos que volver a la pantalla de _Application Overbiew_ para hacer una última configuración. Pulsando en la pestaña de _Payload Formats_ accedemos al formulario donde se permite poner un script para decodificar la trama de datos de nuestro mensaje LoRa. En nuestro caso este es el formato:
+
 
 ## Agradecimientos
 https://learn.sparkfun.com/tutorials/sik-experiment-guide-for-the-arduino-101genuino-101-board-spanish/experimento-15-usar-la-placa-de-detector-de-sonido
