@@ -113,19 +113,19 @@ Al acceder al formulario de registro, únicamente tenemos que rellenar el _Devic
 Finalmente pulsaremos _Register_ y pulsaremos el icono con el nombre de nuestro nuevo dispositivo para ver sus datos de configuración. Aquí encontraremos los parámetros que necesitamos por ser un dispositivo de tipo ABP. Y que tendremos que pasar al fichero de configuración settings.h que se cargará en el _sketch_ del IDE de Arduino.
 Pero el formato para las Keys es diferente. Encontrarás aquí una hoja excel (Encode_EUI.xlsx) que te facilitará esta tarea.
 
-```
-// TTN Configuration
-// LoRaWAN NwkSKey, network session key provided by TTN Console (https://console.thethingsnetwork.org) in Device settings form:
-static const PROGMEM u1_t NWKSKEY[16] = {0x8F,0xDA,......};
-// LoRaWAN AppSKey, application session key provided by TTN Console (https://console.thethingsnetwork.org) in Device settings form:
-static const u1_t PROGMEM APPSKEY[16] = {0xE5,0x0A,......};
-// LoRaWAN end-device address (DevAddr)
-static const u4_t DEVADDR = 0x12345678 ; // <-- Change this address for every node!
+```cpp
+/* OTAA para*/
+uint8_t devEui[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+uint8_t appEui[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+uint8_t appKey[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-// Other params
-const int update_time_alive = 150000;
-const int PhotoCell = 2; 
-const int Buzzer = 15;
+/* ABP para*/
+uint8_t nwkSKey[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+uint8_t appSKey[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+uint32_t devAddr =  ( uint32_t )0x00000000;
+
+/* Other params */
+const int TransmitPeriod = 60000; //Milisecons
 ```
 
 ### Formato de la trama
