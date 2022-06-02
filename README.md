@@ -69,16 +69,15 @@ Hay muchas variantes para implementar este enrutamiento. Para este se ha eleguid
 - Dispositivo es del tipo ABP (Activation-by-personalisation) lo que significa que se identificará en la red con un _DevAddr_ y una _Session key_ preconfigurada. Para ello tenemos que completar el registro de una aplicación y un dispositivo. 
 - Publicación del paquete de-codificado en una cola MQTT a la que nuestra aplicación está subscrita.
 
-<img src="./img/TTN_p1.jpg" width="400" align="left" />
+<img src="./img/TTN_p1.jpg" width="200" align="left" />
 
 Estos son los pasos a seguir empezando por acceder a la aplicación _back-end_ de TTN en esta URL: https://console.cloud.thethings.network/ en la que seleccionaremos nuestra región y luego nos loguearemos con nuestro usuario registrado.
 
-
 ### Registro de la aplicación
-Los dispositivos como este sensor se comunican con la aplicación en la que han sido registrados. Para registras un dispositivo, primero hay que añadir una aplicación.
+En TTN los dispositivos (_devices_) iguales, se agrupan en una aplicación desde la cual serán registrados. por lo tanto, primero hay que añadir una aplicación:
 
-<img src="./img/TTN_p2.jpg" width="400" align="left" />
-<img src="./img/TTN_p3.jpg" width="400" align="right" />
+<img src="./img/TTN_p2.jpg" width="200" align="left" />
+<img src="./img/TTN_p3.jpg" width="200" align="right" />
 
 En el formulario de alta de aplicación rellenaremos estos campos: 
 - Para el _Application ID_, elige un identificador único, en minúsculas, puedes usar caracteres alfanuméricos peor no guiones ´-´ consecutivos.
