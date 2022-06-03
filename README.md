@@ -55,7 +55,16 @@ Otro detalle a tener en cuenta respecto a la alimentación del sensor de sonido,
 ## Configuración IDE Arduino
 Lo para poder programar adecuadamente el dispositivo tendremos que configurar el entorno de programación de Arduino con las configuraciones de hardware y librerias de esta placa.
 1. Añadir la URL https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.4.0/package_CubeCell_index.json a Preferences->Settings->Additional boards:
-2. 
+2. Añadir la libreria de Cayenne:
+
+<img src="./img/lib_cayenne.png"  align="center" />
+
+3. Seleccionar la tarjeta CubeCell HTCC-AB01 y configurar todos sus parámetros así:
+
+<img src="./img/arduino_board_setup_cubecell.png"  align="center" />
+
+### Subir el sketch de Arduino
+Con el cable conectado seleccionamos el puerto USB que nuestro ordenador haya asignado. Una vez compilado y cargado en el dispositvo. Abrimos el monitor serie para comprobar que log de actividad del programa es correcto.
 
 ## Configuración del sensor en la nube (TTN)
 
@@ -73,11 +82,16 @@ Hay muchas variantes para implementar este enrutamiento. Para este se ha eleguid
 
 Estos son los pasos a seguir empezando por acceder a la aplicación _back-end_ de TTN en esta URL: https://console.cloud.thethings.network/ en la que seleccionaremos nuestra región y luego nos loguearemos con nuestro usuario registrado.
 
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
 ### Registro de la aplicación
 En TTN los dispositivos (_devices_) iguales, se agrupan en una aplicación desde la cual serán registrados. por lo tanto, primero hay que añadir una aplicación:
-
-<img src="./img/TTN_p2.jpg" width="200" align="left" />
-<img src="./img/TTN_p3.jpg" width="200" align="left" />
 
 En el formulario de alta de aplicación rellenaremos estos campos: 
 - Para el _Application ID_, elige un identificador único, en minúsculas, puedes usar caracteres alfanuméricos peor no guiones ´-´ consecutivos.
@@ -85,11 +99,22 @@ En el formulario de alta de aplicación rellenaremos estos campos:
 - No hace falta poner nada en _Application EUI_ 
 - Presiona _Create application_ para finalizar
 
-<img src="./img/TTN_p4.jpg" width="400" align="center" />
+<img src="./img/TTN_p2.jpg" width="300" align="left" />
+<img src="./img/TTN_p3.jpg" width="300" align="center" />
+<img src="./img/TTN_p4.jpg" width="300" align="right" />
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
 Aparecerá ahora la página con la nueva aplicación añadida donde encontrarás un botón de _+ Add end device_ necesario para crear los dispositivos asociados. 
 
-<img src="./img/TTN_app_created.png" width="600" align="center" />
+<img src="./img/TTN_app_created.png" align="center" />
 
 ### Registro del dispositivo
 En TTN un dispositivo (devide) representa la configuración de lo que también llama nodo (node) que a fin de cuentas es nuestro sensor. 
@@ -187,9 +212,9 @@ Tras pulsar el botón de ¨import¨ tendrás la vista de los nodos y los flujos.
 ### Configuración cliente MQTT
 Encontrarás todo configurado excepto las crecenciales de acceso. Para utilizar las que has obtenido en los pasos anteriores. Solo tienes que ir a las propiedades del nodo MQTT, editar el _Server_ y acceder a la pestaña _Security_:
 
-<img src="./img/jaleometro_nodered_user_mqtt.png" width="400" align="center" />
+<img src="./img/jaleometro_nodered_user_mqtt.png" align="center" />
 
-<img src="[./](https://github.com/McOrts/garage-cerberus/blob/master/)images/garage-cerberus_IFTTT.png" align="right" />
+<img src="https://github.com/McOrts/garage-cerberus/blob/master/)images/garage-cerberus_IFTTT.png" align="right" />
 
 ### Configurar integración con IFTTT
 La integración con IFTTT (If This Then That) está montada con una sencilla llamada a su _endpoint_ REST utilizando en nodo tipo _http request_ con el siguiente formato. 
