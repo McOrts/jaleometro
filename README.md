@@ -99,8 +99,8 @@ En el formulario de alta de aplicación rellenaremos estos campos:
 - No hace falta poner nada en _Application EUI_ 
 - Presiona _Create application_ para finalizar
 
-<img src="./img/TTN_p2.jpg" width="300" align="left" />
-<img src="./img/TTN_p3.jpg" width="300" align="center" />
+<img src="./img/TTN_p2.jpg" width="250" align="left" />
+<img src="./img/TTN_p3.jpg" width="250" align="left" />
 <img src="./img/TTN_p4.jpg" width="300" align="right" />
 
 <br>
