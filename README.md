@@ -87,45 +87,45 @@ En el formulario de alta de aplicación rellenaremos estos campos:
 
 <img src="./img/TTN_p4.jpg" width="400" align="center" />
 
-#AQUI
+Aparecerá ahora la página con la nueva aplicación añadida donde encontrarás un botón de _+ Add end device_ necesario para crear los dispositivos asociados. 
 
-Ahora seremos redirigidos a la página con la nueva aplicación añadida donde puedes encontrar la _app EUI_ y el _Access Keys_ generados.
-<br>
-<img src="./images/ttn-application.png" width="600" align="center" />
+<img src="./imag/TTN_app_created.png" width="600" align="center" />
 
 ### Registro del dispositivo
+En TTN un dispositivo (devide) representa la configuración de lo que también llama nodo (node) que a fin de cuentas es nuestro sensor. 
+Al acceder al formulario de registro nos quedamos en la pestaña de _From The LoRaWAN Device Repository_ ya que estamos usando un microcontrolador conocido.
+Ahora tenemos que seleccionar el tipo, modelo y marca de nuestro sensor tal y como aparece en la captura inferior. 
+Generar la _Device address, AppSKey y NwkSKey_ pulsando el icono marcado en la imagen para que se genere automáticamente.
+Y finalmente rellenar el _Device ID_ que será el nombre único de este nodo.
 
-<img src="./images/ttn-add-device.png" width="400" align="right" />
+<img src="./img/TTN_device.png"  lign="center" />
 
-En TTN un dispositivo (devide) representa la configuración de lo que también llama nodo (node) que a fin de cuentas es nuestro circuito. 
-Al acceder al formulario de registro, únicamente tenemos que rellenar el _Device ID_ que será el nombre único de este nodo. Es preferible pulsar el icono marcado en la imagen para que se genere automáticamente el _Device EUI_.
+Finalmente pulsaremos _Register en device_ para que, seguidamente aparezca la pantalla con la configuración de nuestro nuevo nodo.Aquí podremos ver los datos de configuración y parámetros que necesitamos por ser un dispositivo de tipo ABP. Y que tendremos que pasar al fichero de configuración settings.h que se cargará en el _sketch_ del IDE de Arduino.
 
-<img src="./images/ttn-add-device_params.png" width="400" align="left" />
+<img src="./img/TTN_device_created.png"  lign="center" />
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
-Finalmente pulsaremos _Register_ y pulsaremos el icono con el nombre de nuestro nuevo dispositivo para ver sus datos de configuración. Aquí encontraremos los parámetros que necesitamos por ser un dispositivo de tipo ABP. Y que tendremos que pasar al fichero de configuración settings.h que se cargará en el _sketch_ del IDE de Arduino.
 Pero el formato para las Keys es diferente. Encontrarás aquí una hoja excel (Encode_EUI.xlsx) que te facilitará esta tarea.
 
 ```cpp
+// LoRaWAN Configuration
 /* OTAA para*/
-uint8_t devEui[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+uint8_t devEui[] = { 0x22, 0x32, 0x33, 0x00, 0x00, 0x88, 0x88, 0x02 };
 uint8_t appEui[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-uint8_t appKey[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+uint8_t appKey[] = { 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x66, 0x01 };
 
 /* ABP para*/
-uint8_t nwkSKey[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-uint8_t appSKey[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-uint32_t devAddr =  ( uint32_t )0x00000000;
+uint8_t nwkSKey[] = { 0xBF,  0x6B, 0x7C, 0xDA, 0x0D, 0x0D, 0x32, 0xB8, 0x3A, 0xC0, 0x65, 0xC8, 0x11, 0x38, 0x81, 0x09 };
+uint8_t appSKey[] = { 0xA2,  0xD1, 0xA1, 0x54, 0x5C, 0x95, 0x26, 0xB3, 0x63, 0x8B, 0xA5, 0x6D, 0x0B, 0x05, 0xD0, 0x1D };
+uint32_t devAddr =  ( uint32_t )0x260B954D;
 
-/* Other params */
-const int TransmitPeriod = 60000; //Milisecons
+// Devise location
+const float latitude = 39.536;
+const float longitude = 2.718;
+const int alt = 30;
+
+// Other params
+float SensorId= 10.02;// Sensor  identifcator number 
+const int ReadDutyCycle = 600000; // Transmision and reading period
 ```
 
 ### Formato de la trama
