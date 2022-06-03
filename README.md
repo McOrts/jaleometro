@@ -24,11 +24,11 @@ Podremos encontrar toda la documentación de esta placa en: [Documentos y ficher
 
 - [Batería de polímero de litio de 3,7V y conector JST SH1.0 de 1,0mm y dos pines](https://es.aliexpress.com/item/4000288987647.html)
 
-<img src="./img/Battery_LiPo37Vph2.png" width="500" align="center" />
+<img src="./img/Battery_LiPo37Vph2.png" width="350" align="center" />
 
 - [Panel solar de 6V](https://es.aliexpress.com/item/4001128543657.html)
 
-<img src="./img/SolarPanel.png" width="300" align="center" />
+<img src="./img/SolarPanel.png" width="350" align="center" />
 
 - [SparkFun Sound Detector](https://www.sparkfun.com/products/14262)
 
@@ -36,7 +36,7 @@ Podremos encontrar toda la documentación de esta placa en: [Documentos y ficher
 
 - [Carcasa hermética IP66](https://es.aliexpress.com/item/33060319519.html)
 
-<img src="./img/IP66_case.png" width="300" align="center" />
+<img src="./img/IP66_case.png" width="400" align="center" />
 
 Por otra parte también se necesitarán otros componentes no electrónicos como cables, mini-protoboard... lo que conforma este kit:
 
@@ -77,7 +77,7 @@ Estos son los pasos a seguir empezando por acceder a la aplicación _back-end_ d
 En TTN los dispositivos (_devices_) iguales, se agrupan en una aplicación desde la cual serán registrados. por lo tanto, primero hay que añadir una aplicación:
 
 <img src="./img/TTN_p2.jpg" width="200" align="left" />
-<img src="./img/TTN_p3.jpg" width="200" align="right" />
+<img src="./img/TTN_p3.jpg" width="200" align="left" />
 
 En el formulario de alta de aplicación rellenaremos estos campos: 
 - Para el _Application ID_, elige un identificador único, en minúsculas, puedes usar caracteres alfanuméricos peor no guiones ´-´ consecutivos.
@@ -89,7 +89,7 @@ En el formulario de alta de aplicación rellenaremos estos campos:
 
 Aparecerá ahora la página con la nueva aplicación añadida donde encontrarás un botón de _+ Add end device_ necesario para crear los dispositivos asociados. 
 
-<img src="./imag/TTN_app_created.png" width="600" align="center" />
+<img src="./img/TTN_app_created.png" width="600" align="center" />
 
 ### Registro del dispositivo
 En TTN un dispositivo (devide) representa la configuración de lo que también llama nodo (node) que a fin de cuentas es nuestro sensor. 
@@ -114,13 +114,13 @@ uint8_t appEui[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 uint8_t appKey[] = { 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x66, 0x01 };
 
 /* ABP para*/
-uint8_t nwkSKey[] = { 0xBF,  0x6B, 0x7C, 0xDA, 0x0D, 0x0D, 0x32, 0xB8, 0x3A, 0xC0, 0x65, 0xC8, 0x11, 0x38, 0x81, 0x09 };
-uint8_t appSKey[] = { 0xA2,  0xD1, 0xA1, 0x54, 0x5C, 0x95, 0x26, 0xB3, 0x63, 0x8B, 0xA5, 0x6D, 0x0B, 0x05, 0xD0, 0x1D };
-uint32_t devAddr =  ( uint32_t )0x260B954D;
+uint8_t nwkSKey[] = { 0xBF,  0x6B, 0x7C, 0xDA, 0x0D, 0x0D, 0x32, 0xB8, 0x3A, 0xC5, 0x65, 0xC8, 0x11, 0x38, 0x81, 0x09 };
+uint8_t appSKey[] = { 0xA2,  0xD1, 0xA1, 0x54, 0x5B, 0x85, 0x26, 0xB3, 0x63, 0x8B, 0xA5, 0x6D, 0x0B, 0x05, 0xD0, 0x1D };
+uint32_t devAddr =  ( uint32_t )0x260B964D;
 
 // Devise location
-const float latitude = 39.536;
-const float longitude = 2.718;
+const float latitude = 39.936;
+const float longitude = 3.718;
 const int alt = 30;
 
 // Other params
@@ -129,11 +129,81 @@ const int ReadDutyCycle = 600000; // Transmision and reading period
 ```
 
 ### Formato de la trama
-<img src="./images/ttn-add-payload_format.png" width="400" align="right" />
 
-Tendremos que volver a la pantalla de _Application Overbiew_ para hacer una última configuración. Pulsando en la pestaña de _Payload Formats_ accedemos al formulario donde se permite poner un script para decodificar la trama de datos de nuestro mensaje LoRa. En nuestro caso este es el formato:
+Desde el menú vertical izquierdo accederemos al _Payload Formatters_ y la opción Uplink para definir cómo decodificar la trama de datos de nuestro mensaje LoRa que hemos establecido en el firmware. En nuestro caso hemos usando la librería CayenneLPP y esto es lo que aquí tenemos de seleccionar como tipo:
 
+<img src="./img/TTN_app_uplink_format.png" width="400" align="center" />
+
+De esta manera el mensaje MQTT que vamos a utilizar para leer los valores del sensor; será generado por backend de TTN en una estructura JSON perfectamente formateada:
+
+```json
+{
+ "uplink_message":{
+      "f_port":2,
+      "f_cnt":539,
+      "frm_payload":"AQID6QFlAE8CZQDDAogGCGAAaiwAC7g=",
+      "decoded_payload":{
+         "analog_in_1":10.02,
+         "gps_2":{
+            "altitude":30,
+            "latitude":39.936,
+            "longitude":3.718
+         },
+         "luminosity_1":79,
+         "luminosity_2":195
+      }
+}
+```
+### Integración MQTT
+Por último necesitaremos las credenciales de acceso al broker MQTT que TTN nos ofrece como una opción de integración para poder suscribirnos a topic desde nuestra aplicación:
+
+<img src="./img/TTN_app_mqtt.png" width="400" align="center" />
+
+**IMPORTANTE**: copia el password ahora porque una vez cerrada esta ventana. No tendrás opción a consultarlo.
+
+## Gráficas y alarmas en Node-RED
+Partimos de una instacia Node-RED con nodo para mostrar un interface de usuario que se llama _dashboard_. Lo que se puede hacer desde la opción _Manage Palette_ de la aplicación de administración.
+
+Se ha construido un sencillo flujo para representar unas gráficas y poder establecer un umbral de alerta para enviar un mensaje a IFTTT
+
+<img src="./img/jaleometro_nodered_ui_mqtt.png"  align="center" />
+
+El cual genera el siguiente dashboard:
+
+<img src="./img/jaleometro_nodered_ui.png"  align="center" />
+
+En el flujo de Node-RED se tratan y muestran gráficamente los mensajes MQTT leidos. El _payload_ contiene el json con los valores de:
+- Ruido medio en "luminosity_1"
+- Ruido pico en "luminosity_2"
+- Id de sensor en "analog_in_1"
+- Coordenadas geográficas en "gps_2"
+
+Para importar el flujo deberemos acceder a la aplicación Node-RED que tenemos arrancada donde encontraremos la opción de importar pulsando el botón de menú tipo hamburguesa. Lo más fácil es copiar al portapapeles de equipo el contenido del fichero jaleometro_nodered_ui_mqtt y pegarlo en la pantalla:
+
+<img src="./img/node-red_import-flow.png" width="400" align="center" />
+
+Tras pulsar el botón de ¨import¨ tendrás la vista de los nodos y los flujos. Pero hay tres de ellos que no están correctamente configurados.
+
+### Configuración cliente MQTT
+Encontrarás todo configurado excepto las crecenciales de acceso. Para utilizar las que has obtenido en los pasos anteriores. Solo tienes que ir a las propiedades del nodo MQTT, editar el _Server_ y acceder a la pestaña _Security_:
+
+<img src="./img/jaleometro_nodered_user_mqtt.png" width="400" align="center" />
+
+<img src="[./](https://github.com/McOrts/garage-cerberus/blob/master/)images/garage-cerberus_IFTTT.png" align="right" />
+
+### Configurar integración con IFTTT
+La integración con IFTTT (If This Then That) está montada con una sencilla llamada a su _endpoint_ REST utilizando en nodo tipo _http request_ con el siguiente formato. 
+<br>
+```
+https://maker.ifttt.com/trigger/domohome_garage_intruder/with/key/???????????
+```
+<br>
+Donde sustituiremos las interrogantes por la Key que encontramos en esta configuración del componente Maker _Webhooks_ en IFTTT. Que configuraremos para recibir el evento disparar los avisos nativos en nuestra móvil a fin de tener notificación de la alarma.
+
+<img src="https://github.com/McOrts/garage-cerberus/blob/master/images/garage-cerberus_IFTTT-webhooks.png"  width="300" align="center" />
 
 ## Agradecimientos
-https://learn.sparkfun.com/tutorials/sik-experiment-guide-for-the-arduino-101genuino-101-board-spanish/experimento-15-usar-la-placa-de-detector-de-sonido
+- A Christoph Hafner y Javier Maura cuyo proyecto Moix me ha servido de inspiración https://github.com/Makespace-Mallorca/moix
+- A mi compañero Alexandre Coll por su buenos consejos de cómo medir el ruido https://www.linkedin.com/in/alexandre-coll-molina/
+- A Sparkfun por su buena documentación: https://learn.sparkfun.com/tutorials/sik-experiment-guide-for-the-arduino-101genuino-101-board-spanish/experimento-15-usar-la-placa-de-detector-de-sonido
 
