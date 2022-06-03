@@ -1,8 +1,16 @@
 #include "LoRaWan_APP.h"
 #include "Arduino.h"
 #include <CayenneLPP.h>//the library is needed ��https://github.com/ElectronicCats/CayenneLPP��
+#include "settings.h"
 
-float vBat; // battery voltage
+int loops; // number of readings
+float noise_avg; // noise level average
+unsigned int noise_peak; // noise peak value
+unsigned int noise; // current noise value
+unsigned long noise_sum; // noise level addition
+unsigned long tmp_ini; 
+unsigned long tmp_pause; 
+boolean run_init = true;
 
 /*
  * set LoraWan_RGB to Active,the RGB active in loraWan
@@ -12,16 +20,6 @@ float vBat; // battery voltage
  * RGB yellow means RxWindow2;
  * RGB green means received done;
  */
-
-/* OTAA para*/
-uint8_t devEui[] = { 0x22, 0x32, 0x33, 0x00, 0x00, 0x88, 0x88, 0x02 };
-uint8_t appEui[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-uint8_t appKey[] = { 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x66, 0x01 };
-
-/* ABP para*/
-uint8_t nwkSKey[] = { 0xBF,  0x6B, 0x7C, 0xDA, 0x0D, 0x0D, 0x32, 0xB8, 0x3A, 0xC0, 0x65, 0xC8, 0x11, 0x38, 0x81, 0x09 };
-uint8_t appSKey[] = { 0xA2,  0xD1, 0xA1, 0x54, 0x5C, 0x95, 0x26, 0xB3, 0x63, 0x8B, 0xA5, 0x6D, 0x0B, 0x05, 0xD0, 0x1D };
-uint32_t devAddr =  ( uint32_t )0x260B954D;
 
 /*LoraWan channelsmask, default channels 0-7*/ 
 uint16_t userChannelsMask[6]={ 0x00FF,0x0000,0x0000,0x0000,0x0000,0x0000 };
@@ -33,7 +31,7 @@ LoRaMacRegion_t loraWanRegion = ACTIVE_REGION;
 DeviceClass_t  loraWanClass = LORAWAN_CLASS;
 
 /*the application data transmission duty cycle.  value in [ms].*/
-uint32_t appTxDutyCycle = 600000;
+uint32_t appTxDutyCycle = ReadDutyCycle;
 
 /*OTAA or ABP*/
 bool overTheAirActivation = LORAWAN_NETMODE;
@@ -81,31 +79,55 @@ static void prepareTxFrame( uint8_t port )
 	*for example, if use REGION_CN470, 
 	*the max value for different DR can be found in MaxPayloadOfDatarateCN470 refer to DataratesCN470 and BandwidthsCN470 in "RegionCN470.h".
 	*/
-    vBat = getBatteryVoltage()/1000;
-    Serial.print("Battery voltage: ");
-    Serial.print(vBat);
-    Serial.println("V");  
+  if (!run_init) {
+    // Noise calculations
+    noise_avg = int(noise_sum / loops);
+    Serial.print("Noise average: ");
+    Serial.println(noise_avg);
+    Serial.println(noise_sum);
+    Serial.println(loops);
+    
     CayenneLPP lpp(LORAWAN_APP_DATA_MAX_SIZE);
-    lpp.addAnalogInput(1,vBat);
-    lpp.addAnalogInput(2, 1.23f);
-    lpp.addGPS(3, -12.34f, 45.56f, 9.01f);
+    lpp.addAnalogInput(1,SensorId);
+    lpp.addLuminosity(1, noise_avg);
+    lpp.addLuminosity(2, noise_peak);
+    lpp.addGPS(2, latitude, longitude, alt);
     lpp.getBuffer(), 
     appDataSize = lpp.getSize();
     memcpy(appData,lpp.getBuffer(),appDataSize);
     Serial.print(appDataSize);
     Serial.println(F(" bytes long LPP packet queued."));    
+
+    noise_peak = 0;
+    noise_sum = 0;
+    loops = 0;
+  } else {
+    run_init = false;
+  }
+  
 }
 
 void setup() {
 	Serial.begin(115200);
+ 
+  tmp_ini = millis(); 
+
+  noise_avg = 0;
+  noise_peak = 0;
+  noise_sum = 0;
+  loops = 0;
+ 
 #if(AT_SUPPORT)
 	enableAt();
 #endif
 	deviceState = DEVICE_STATE_INIT;
 	LoRaWAN.ifskipjoin();
+  Serial.print("deviceState: "); 
+  Serial.println(deviceState); 
 }
 
-void loop(){
+void loop(){ 
+
 	switch( deviceState )
 	{
 		case DEVICE_STATE_INIT:
@@ -119,13 +141,13 @@ void loop(){
 			printDevParam();
 			LoRaWAN.init(loraWanClass,loraWanRegion);
 			deviceState = DEVICE_STATE_JOIN;
-      Serial.println ('Init'); 
+      Serial.println ("Init"); 
 			break;
 		}
 		case DEVICE_STATE_JOIN:
 		{
 			LoRaWAN.join();
-      Serial.println ('Join');
+      Serial.println ("Join");
 			break;
 		}
 		case DEVICE_STATE_SEND:
@@ -133,7 +155,7 @@ void loop(){
 			prepareTxFrame( appPort );
 			LoRaWAN.send();
 			deviceState = DEVICE_STATE_CYCLE;
-      Serial.println ('Send');
+      Serial.println ("Send");
 			break;
 		}
 		case DEVICE_STATE_CYCLE:
@@ -142,17 +164,53 @@ void loop(){
 			txDutyCycleTime = appTxDutyCycle + randr( 0, APP_TX_DUTYCYCLE_RND );
 			LoRaWAN.cycle(txDutyCycleTime);
 			deviceState = DEVICE_STATE_SLEEP;
-      Serial.println ('Cycle');
+      Serial.println ("Cycle");
+
 			break;
 		}
 		case DEVICE_STATE_SLEEP:
 		{
-			LoRaWAN.sleep();
-			break;
+
+      // Delay to wait transmission ending to avoid interference with the sensor
+      if (loops == 0) {      
+        tmp_pause = millis();
+        while (millis() - tmp_pause < 30000) {
+          // wait 30 s
+        }
+      }
+
+      // Noise reading each second
+      noise = analogRead(ADC);
+      if (millis() - tmp_ini > 1000) {
+        noise_sum += noise;
+        loops ++;
+        Serial.print("Noise: ");
+        Serial.print(noise);
+        Serial.print(" loop: ");
+        Serial.println(loops);
+        tmp_ini = millis(); 
+      }
+      if (noise > noise_peak) {
+        noise_peak = noise;
+        Serial.print("Noise peak: ");
+        Serial.println(noise_peak);
+      }
+      // adjustment of outliers due transmission interference 
+      if (loops < 30 && noise_peak > 2000) {
+        noise_sum -= noise_peak;
+        noise_peak = 0;
+        loops --;
+        Serial.println("outlier removed");
+      }
+
+      //LoRaWAN.sleep();
+
+      break;
 		}
 		default:
 		{
 			deviceState = DEVICE_STATE_INIT;
+      Serial.println ("Default");      
 			break;
 		}
 	}
