@@ -214,7 +214,7 @@ Encontrarás todo configurado excepto las crecenciales de acceso. Para utilizar 
 
 <img src="./img/jaleometro_nodered_user_mqtt.png" align="center" />
 
-<img src="https://github.com/McOrts/garage-cerberus/blob/master/)images/garage-cerberus_IFTTT.png" align="right" />
+<img src="https://github.com/McOrts/garage-cerberus/blob/master/images/garage-cerberus_IFTTT.png" align="right" />
 
 ### Configurar integración con IFTTT
 La integración con IFTTT (If This Then That) está montada con una sencilla llamada a su _endpoint_ REST utilizando en nodo tipo _http request_ con el siguiente formato. 
