@@ -55,7 +55,7 @@ Otro detalle a tener en cuenta respecto a la alimentación del sensor de sonido,
 ## Configuración IDE Arduino
 Lo para poder programar adecuadamente el dispositivo tendremos que configurar el entorno de programación de Arduino con las configuraciones de hardware y librerias de esta placa.
 1. Añadir la URL https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.4.0/package_CubeCell_index.json a Preferences->Settings->Additional boards:
-2. Añadir la libreria de Cayenne:
+3. Añadir la libreria de Cayenne. **Importante: versión 1.1.0**:
 
 <img src="./img/lib_cayenne.png"  align="center" />
 
@@ -129,19 +129,15 @@ Finalmente pulsaremos _Register en device_ para que, seguidamente aparezca la pa
 
 <img src="./img/TTN_device_created.png"  lign="center" />
 
-Pero el formato para las Keys es diferente. Encontrarás aquí una hoja excel (Encode_EUI.xlsx) que te facilitará esta tarea.
+Para poder copiar las _keys_ en el formato "array" que se requiere en el fichero de configuración. Hay que pulsar el icono <> de "_toggle array formating_"
 
 ```cpp
 // LoRaWAN Configuration
-/* OTAA para*/
-uint8_t devEui[] = { 0x22, 0x32, 0x33, 0x00, 0x00, 0x88, 0x88, 0x02 };
-uint8_t appEui[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-uint8_t appKey[] = { 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x66, 0x01 };
 
 /* ABP para*/
-uint8_t nwkSKey[] = { 0xBF,  0x6B, 0x7C, 0xDA, 0x0D, 0x0D, 0x32, 0xB8, 0x3A, 0xC5, 0x65, 0xC8, 0x11, 0x38, 0x81, 0x09 };
-uint8_t appSKey[] = { 0xA2,  0xD1, 0xA1, 0x54, 0x5B, 0x85, 0x26, 0xB3, 0x63, 0x8B, 0xA5, 0x6D, 0x0B, 0x05, 0xD0, 0x1D };
-uint32_t devAddr =  ( uint32_t )0x260B964D;
+uint8_t nwkSKey[] = { 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x66, 0x01 };
+uint8_t appSKey[] = { 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x66, 0x01 };
+uint32_t devAddr =  ( uint32_t )0x00000000;
 
 // Devise location
 const float latitude = 39.936;
