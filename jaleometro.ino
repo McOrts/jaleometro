@@ -4,8 +4,11 @@
 #include "settings.h"
 
 int loops; // number of readings
+float cycles; // number of read and transmisions cycles.
+float icycles; // delta for cycles counter.
 float noise_avg; // noise level average
 unsigned int noise_peak; // noise peak value
+unsigned int noise_min; // noise minimun value
 unsigned int noise; // current noise value
 unsigned long noise_sum; // noise level addition
 unsigned long tmp_ini; 
@@ -80,6 +83,14 @@ static void prepareTxFrame( uint8_t port )
 	*the max value for different DR can be found in MaxPayloadOfDatarateCN470 refer to DataratesCN470 and BandwidthsCN470 in "RegionCN470.h".
 	*/
   if (!run_init) {
+    // Cycles control
+    if (cycles>99) {
+      icycles = -1 ;
+    } else if (cycles<1){
+      icycles = +1 ;
+    }
+    cycles += icycles;
+
     // Noise calculations
     noise_avg = int(noise_sum / loops);
     Serial.print("Noise average: ");
@@ -89,8 +100,10 @@ static void prepareTxFrame( uint8_t port )
     
     CayenneLPP lpp(LORAWAN_APP_DATA_MAX_SIZE);
     lpp.addAnalogInput(1,SensorId);
+    lpp.addAnalogInput(2,cycles);
     lpp.addLuminosity(1, noise_avg);
     lpp.addLuminosity(2, noise_peak);
+    lpp.addLuminosity(3, noise_min);    
     lpp.addGPS(2, latitude, longitude, alt);
     lpp.getBuffer(), 
     appDataSize = lpp.getSize();
@@ -99,6 +112,7 @@ static void prepareTxFrame( uint8_t port )
     Serial.println(F(" bytes long LPP packet queued."));    
 
     noise_peak = 0;
+    noise_min = 1000;
     noise_sum = 0;
     loops = 0;
   } else {
@@ -114,8 +128,11 @@ void setup() {
 
   noise_avg = 0;
   noise_peak = 0;
+  noise_min = 1000;  
   noise_sum = 0;
   loops = 0;
+  cycles = 1;
+  icycles = +1;
  
 #if(AT_SUPPORT)
 	enableAt();
@@ -187,7 +204,9 @@ void loop(){
         Serial.print("Noise: ");
         Serial.print(noise);
         Serial.print(" loop: ");
-        Serial.println(loops);
+        Serial.print(loops);
+        Serial.print(" cycles: ");
+        Serial.println(cycles);
         tmp_ini = millis(); 
       }
       if (noise > noise_peak) {
@@ -195,6 +214,12 @@ void loop(){
         Serial.print("Noise peak: ");
         Serial.println(noise_peak);
       }
+      if (noise < noise_min) {
+        noise_min = noise;
+        Serial.print("Noise min: ");
+        Serial.println(noise_min);
+      }
+
       // adjustment of outliers due transmission interference 
       if (loops < 30 && noise_peak > 2000) {
         noise_sum -= noise_peak;
