@@ -1,4 +1,4 @@
-# Sensor remoto y autónomo de ruido ambiental 
+# <img src="./img/jaleometro_logo_min_transparent.png" />  Sensor remoto y autónomo de ruido ambiental 
 Este dispositivo se ha diseñado para monitorizar el ruido ambiental de forma indefinida utilizando energia solar. 
 
 Por otra parte se van a utilizar comunicaciones de largo alcance tipo LPWAN (Low Power Wide Area Networks). En este caso será una modluación **LoRa** (Long Range) que además es muy eficientes en el consumo de energía. La tecnología LoRa y la capa de red abierta LoRaWAN son los protagonistas del despliegue del IoT.
