@@ -55,11 +55,15 @@ Otro detalle a tener en cuenta respecto a la alimentación del sensor de sonido,
 ## Configuración IDE Arduino
 Lo para poder programar adecuadamente el dispositivo tendremos que configurar el entorno de programación de Arduino con las configuraciones de hardware y librerias de esta placa.
 1. Añadir la URL https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.4.0/package_CubeCell_index.json a Preferences->Settings->Additional boards:
-3. Añadir la libreria de Cayenne. **Importante: versión 1.1.0**:
+2. Añadir la libreria de CayenneLPP. **Importante: versión 1.1.0**:
 
 <img src="./img/lib_cayenne.png"  align="center" />
 
-3. Seleccionar la tarjeta CubeCell HTCC-AB01 y configurar todos sus parámetros así:
+3. Si aparece un aviso de instalar otras librerias con dependencias. Seleccionar opción de instalar todas:
+
+<img src="./img/library_dependencies.png"  align="center" />
+
+4. Seleccionar la tarjeta CubeCell HTCC-AB01 y configurar todos sus parámetros así:
 
 <img src="./img/arduino_board_setup_cubecell.png"  align="center" />
 
