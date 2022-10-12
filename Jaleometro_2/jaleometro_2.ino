@@ -13,7 +13,7 @@ unsigned int noise; // current noise value
 unsigned long noise_sum; // noise level addition
 unsigned long tmp_ini; 
 unsigned long tmp_pause; 
-boolean run_init = true;
+boolean run_init = true; // aboid to send in the first connection
 
 /*
  * set LoraWan_RGB to Active,the RGB active in loraWan
@@ -34,7 +34,7 @@ LoRaMacRegion_t loraWanRegion = ACTIVE_REGION;
 DeviceClass_t  loraWanClass = LORAWAN_CLASS;
 
 /*the application data transmission duty cycle.  value in [ms].*/
-uint32_t appTxDutyCycle = ReadDutyCycle;
+uint32_t appTxDutyCycle = 60000;
 
 /*OTAA or ABP*/
 bool overTheAirActivation = LORAWAN_NETMODE;
@@ -117,13 +117,12 @@ static void prepareTxFrame( uint8_t port )
     loops = 0;
   } else {
     run_init = false;
-  }
-  
+  } 
 }
 
 void setup() {
 	Serial.begin(115200);
- 
+
   tmp_ini = millis(); 
   noise_avg = 0;
   noise_peak = 0;
@@ -132,7 +131,7 @@ void setup() {
   loops = 0;
   cycles = 1;
   icycles = +1;
- 
+    
 #if(AT_SUPPORT)
 	enableAt();
 #endif
@@ -142,13 +141,12 @@ void setup() {
   Serial.println(deviceState); 
 }
 
-void loop(){ 
-
+void loop()
+{
 	switch( deviceState )
 	{
 		case DEVICE_STATE_INIT:
 		{
-      Serial.println ("Init---------------------"); 
 #if(LORAWAN_DEVEUI_AUTO)
 			LoRaWAN.generateDeveuiByChipID();
 #endif
@@ -158,79 +156,42 @@ void loop(){
 			printDevParam();
 			LoRaWAN.init(loraWanClass,loraWanRegion);
 			deviceState = DEVICE_STATE_JOIN;
+      Serial.println ("Init----------------------"); 
 			break;
 		}
 		case DEVICE_STATE_JOIN:
 		{
-      Serial.println ("Join--------------------");
 			LoRaWAN.join();
+      Serial.println ("Join----------------------");
 			break;
 		}
 		case DEVICE_STATE_SEND:
 		{
-      Serial.println ("Send---------------------");
-  		prepareTxFrame( appPort );
+      voltage=getBatteryVoltage()/1000;
+      Serial.print("Voltaje: ");
+      Serial.print(voltage);
+			Serial.print(" cycles: ");
+      Serial.println(cycles);
+			prepareTxFrame( appPort );
 			LoRaWAN.send();
 			deviceState = DEVICE_STATE_CYCLE;
 			break;
 		}
 		case DEVICE_STATE_CYCLE:
 		{
-      Serial.println ("Cycle--------------------");
 			// Schedule next packet transmission
 			txDutyCycleTime = appTxDutyCycle + randr( 0, APP_TX_DUTYCYCLE_RND );
 			LoRaWAN.cycle(txDutyCycleTime);
 			deviceState = DEVICE_STATE_SLEEP;
-
 			break;
 		}
 		case DEVICE_STATE_SLEEP:
 		{
-      Serial.println ("Sleep--------------------");
-
-      // Delay to wait transmission ending to avoid interference with the sensor
-      if (loops == 0) {      
-        tmp_pause = millis();
-        while (millis() - tmp_pause < 30000) {
-          // wait 30 s
-        }
-      }
-
-      // Noise reading each second
-      noise = analogRead(ADC);
-      if (noise > 4500) {
-        Serial.println("outlier removed");
-      } else {
-        if (millis() - tmp_ini > 1000) {
-          noise_sum += noise;
-          loops ++;
-          Serial.print("Noise: ");
-          Serial.print(noise);
-          Serial.print(" loop: ");
-          Serial.print(loops);
-          Serial.print(" cycles: ");
-          Serial.println(cycles);
-          tmp_ini = millis(); 
-        }
-        if (noise > noise_peak) {
-          noise_peak = noise;
-          Serial.print("Noise peak: ");
-          Serial.println(noise_peak);
-        }
-        if (noise < noise_min) {
-          noise_min = noise;
-          Serial.print("Noise min: ");
-          Serial.println(noise_min);
-        }
-      }
-
-      //LoRaWAN.sleep();
-
-      break;
+			LoRaWAN.sleep();
+			break;
 		}
 		default:
 		{
-      Serial.println ("Init---------------------------");      
 			deviceState = DEVICE_STATE_INIT;
 			break;
 		}
