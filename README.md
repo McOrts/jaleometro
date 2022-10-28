@@ -186,6 +186,16 @@ Por último necesitaremos las credenciales de acceso al broker MQTT que TTN nos 
 
 **IMPORTANTE**: copia el password ahora porque una vez cerrada esta ventana. No tendrás opción a consultarlo.
 
+## Análisis de la señal
+Cuando hablamos de sonido o de ruido, la magnitud que se utiliza con mayor frecuencia son los dBA. Los fabricantes de dispositivos utilizan mucho esta escala logarítmica en sistemas de audio.
+Pero para llegar a esta medida, haremos varias transformaciones y calibrados.
+1.A Partimos que el sensor de sonido SparkFun Sound Detector nos da una medida analógica con un rango desde 0 a 4500. Ya que se aplica un filtro de banda alta para eliminar los _outlier_. Pero esta medida analógica no es el valor instantaneo del sonido o presión sonora. Si no la envolvente de 1 segundo de muestreo calculada por el circuito del sensor. Linea verde del gráfico:
+
+1.B Y tenemos que determinar el valor base que corresponda con la medida en silencio.
+2. Calculamos el valor medio del periodo de ciclo de transmisión que es de 10 minutos. Aunque lo correcto sería aplicar la fórmula.
+3. msg.noise_LAeq = noise_calibration * 20 * Math.log10(Number(noise_avg)/noise_baseline);
+
+
 ## Gráficas y alarmas en Node-RED
 Partimos de una instacia Node-RED con nodo para mostrar un interface de usuario que se llama _dashboard_. Lo que se puede hacer desde la opción _Manage Palette_ de la aplicación de administración.
 
