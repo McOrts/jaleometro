@@ -186,7 +186,7 @@ void loop(){
 		}
 		case DEVICE_STATE_SLEEP:
 		{
-      Serial.println ("Sleep--------------------");
+      //Serial.println ("Sleep--------------------");
 
       // Delay to wait transmission ending to avoid interference with the sensor
       if (loops == 0) {      
@@ -197,7 +197,7 @@ void loop(){
       }
 
       // Noise reading each second
-      noise = analogRead(ADC);
+      noise = analogRead(ADC );
       if (noise > 4500) {
         Serial.println("outlier removed");
       } else {
