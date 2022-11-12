@@ -54,7 +54,7 @@ Otro detalle a tener en cuenta respecto a la alimentación del sensor de sonido,
 
 ## Configuración IDE Arduino
 Lo para poder programar adecuadamente el dispositivo tendremos que configurar el entorno de programación de Arduino con las configuraciones de hardware y librerias de esta placa.
-1. Añadir la URL https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.4.0/package_CubeCell_index.json a Preferences->Settings->Additional boards:
+1. Añadir la URL https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.5.0/package_CubeCell_index.json a Preferences->Settings->Additional boards:
 2. Añadir la libreria de CayenneLPP. **Importante: versión 1.1.0**:
 
 <img src="./img/lib_cayenne.png"  align="center" />
