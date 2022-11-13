@@ -124,14 +124,19 @@ Aparecerá ahora la página con la nueva aplicación añadida donde encontrarás
 En TTN un dispositivo (devide) representa la configuración de lo que también llama nodo (node) que a fin de cuentas es nuestro sensor. 
 Al acceder al formulario de registro nos quedamos en la pestaña de _From The LoRaWAN Device Repository_ ya que estamos usando un microcontrolador conocido.
 Ahora tenemos que seleccionar el tipo, modelo y marca de nuestro sensor tal y como aparece en la captura inferior. 
-Generar la _Device address, AppSKey y NwkSKey_ pulsando el icono marcado en la imagen para que se genere automáticamente.
-Y finalmente rellenar el _Device ID_ que será el nombre único de este nodo.
+<img src="./img/TTN_device.png"  align="center" />
 
-<img src="./img/TTN_device.png"  lign="center" />
+El la casilla inferior vemos que pide una clave de JoinEUI que normalmente nos la daría el fabricante. Pero en nuestro caso utilzaremos una sencilla aplicación web para generarla:  https://descartes.co.uk/CreateEUIKey.html
+<img src="./img/Create_random_EUI.png"  align="center" />
+
+Lo siguiente será generar la _DevEUIy  AppKey_ pulsando el icono marcado en la imagen para que se genere automáticamente.
+Finalmente queda rellenar el _Device ID_ que será el nombre único de este nodo.
+
+<img src="./img/TTN_device_keys.png"  align="center" />
 
 Finalmente pulsaremos _Register en device_ para que, seguidamente aparezca la pantalla con la configuración de nuestro nuevo nodo.Aquí podremos ver los datos de configuración y parámetros que necesitamos por ser un dispositivo de tipo ABP. Y que tendremos que pasar al fichero de configuración settings.h que se cargará en el _sketch_ del IDE de Arduino.
 
-<img src="./img/TTN_device_created.png"  lign="center" />
+<img src="./img/TTN_device_created.png"  align="center" />
 
 Para poder copiar las _keys_ en el formato "array" que se requiere en el fichero de configuración. Hay que pulsar el icono <> de "_toggle array formating_"
 
