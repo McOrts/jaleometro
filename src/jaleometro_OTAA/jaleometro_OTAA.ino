@@ -52,11 +52,12 @@ void setup() {
 
   tmp_ini = millis(); 
   noise_avg = 0;
+  noise_avg_pre = LowNoiseLevel;
   noise_peak = 0;
   noise_min = 1000;  
   noise_sum = 0;
   loops = 0;
-  cycles = 1;
+  cycles = 50;
   icycles = 1;
   noise_avg = LowNoiseLevel;
 
@@ -181,6 +182,7 @@ void loop()
     // Low Noise Mode if two Noise Overage are under LowNoiseLevel
     if (noise_avg < LowNoiseLevel && noise_avg_pre < LowNoiseLevel) {
       if (lorawanClass == CLASS_A) {
+        cycles -= icycles;
         Serial.println("Sleep");
         lowPowerSleep(Sleep4NoNoise); 
       }
