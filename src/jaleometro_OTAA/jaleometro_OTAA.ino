@@ -1,34 +1,27 @@
 /**
- * This is an example of joining, sending and receiving data via LoRaWAN using a more minimal interface.
- * 
- * The example is configured for OTAA, set your keys into the variables below.
- * 
- * The example will upload a counter value periodically, and will print any downlink messages.
- * 
- * please disable AT_SUPPORT in tools menu
  *
- * David Brodrick.
+ * Carlos Orts
  */
 #include "LoRaWanMinimal_APP.h"
+#include <CayenneLPP.h>//the library is needed https://github.com/ElectronicCats/CayenneLPP
 #include "Arduino.h"
+#include "settings.h"
 
-/*
- * set LoraWan_RGB to Active,the RGB active in loraWan
- * RGB red means sending;
- * RGB purple means joined done;
- * RGB blue means RxWindow1;
- * RGB yellow means RxWindow2;
- * RGB green means received done;
- */
+int loops; // number of readings
+float cycles; // number of read and transmisions cycles.
+float icycles; // delta for cycles counter.
+float noise_avg; // noise level average
+float noise_avg_pre; // noise level average previous
+unsigned int noise_peak; // noise peak value
+unsigned int noise_min; // noise minimun value
+unsigned int noise; // current noise value
+unsigned long noise_sum; // noise level addition
 
-//Set these OTAA parameters to match your app/node in TTN
-static uint8_t devEui[] = { 0x70, 0xB3, 0xD5, 0x7E, 0xD0, 0x05, 0x4F, 0x6C };
-static uint8_t appEui[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-static uint8_t appKey[] = { 0x23, 0x8C, 0xB0, 0x9C, 0x35, 0xEE, 0x36, 0x69, 0x81, 0xA8, 0xAE, 0x3E, 0xBD, 0x30, 0xA0, 0x48 };
+unsigned long tmp_ini; 
+long CountStart = 0;
+long now_DutyCycle = 0;
 
-uint16_t userChannelsMask[6]={ 0x00FF,0x0000,0x0000,0x0000,0x0000,0x0000 };
-
-static uint8_t counter=0;
+CayenneLPP lpp(LORAWAN_APP_DATA_MAX_SIZE);//if use AT mode, don't modify this value or may run dead https://github.com/HelTecAutomation/CubeCell-Arduino/search?q=commissioning.h
 
 ///////////////////////////////////////////////////
 //Some utilities for going into low power mode
@@ -57,6 +50,16 @@ static void lowPowerSleep(uint32_t sleeptime)
 void setup() {
 	Serial.begin(115200);
 
+  tmp_ini = millis(); 
+  noise_avg = 0;
+  noise_peak = 0;
+  noise_min = 1000;  
+  noise_sum = 0;
+  loops = 0;
+  cycles = 1;
+  icycles = 1;
+  noise_avg = LowNoiseLevel;
+
   if (ACTIVE_REGION==LORAMAC_REGION_AU915) {
     //TTN uses sub-band 2 in AU915
     LoRaWAN.setSubBand2();
@@ -73,8 +76,8 @@ void setup() {
     if (!LoRaWAN.isJoined()) {
       //In this example we just loop until we're joined, but you could
       //also go and start doing other things and try again later
-      Serial.println("JOIN FAILED! Sleeping for 30 seconds");
-      lowPowerSleep(30000);
+      Serial.println("JOIN FAILED! Sleeping for 60 seconds");
+      lowPowerSleep(60000);
     } else {
       Serial.println("JOINED");
       break;
@@ -82,25 +85,109 @@ void setup() {
   }
 }
 
-///////////////////////////////////////////////////
-void loop()
+void transmitRecord()
 {
-  //Counter is just some dummy data we send for the example
-  counter++; 
-  
-  //In this demo we use a timer to go into low power mode to kill some time.
-  //You might be collecting data or doing something more interesting instead.
-  lowPowerSleep(15000);  
+  /*
+  * set LoraWan_RGB to Active,the RGB active in loraWan
+  * RGB red means sending;
+  * RGB purple means joined done;
+  * RGB blue means RxWindow1;
+  * RGB yellow means RxWindow2;
+  * RGB green means received done;
+  */
+ 
+  // Cycles control
+  if (cycles>99) {
+    icycles = -1 ;
+  } else if (cycles<1){
+    icycles = +1 ;
+  }
+  cycles += icycles;
+   
+  // Cayenne
+  lpp.reset();
+  lpp.addAnalogInput(1,SensorId);
+  lpp.addAnalogInput(2,cycles);
+  lpp.addLuminosity(1, noise_avg);
+  lpp.addLuminosity(2, noise_peak);
+  lpp.addLuminosity(3, noise_min);    
+  lpp.addGPS(2, latitude, longitude, alt);
 
-  //Now send the data. The parameters are "data size, data pointer, port, request ack"
-  Serial.printf("\nSending packet with counter=%d\n", counter);
-  //Here we send confirmed packed (ACK requested) only for the first five (remember there is a fair use policy)
-  bool requestack=counter<5?true:false;
-  if (LoRaWAN.send(1, &counter, 1, requestack)) {
+  Serial.println("Transmiting...");
+  Serial.print("lpp data size: ");
+  Serial.print(lpp.getSize());
+  Serial.println();
+  
+  // Request ACK only for the 3 firts transmision of a cycle
+  bool requestack=cycles<3?true:false;
+  
+  // if (LoRaWAN.send(1, lpp.getBuffer(), lpp.getSize(), requestack)) {
+  if (LoRaWAN.send(lpp.getSize(), lpp.getBuffer(), 2, requestack)) {
     Serial.println("Send OK");
   } else {
     Serial.println("Send FAILED");
   }
+}
+///////////////////////////////////////////////////
+void loop()
+{
+
+  // Noise reading each second
+  noise = analogRead(ADC );
+  if (noise > 4500) {
+    Serial.println("outlier removed");
+  } else {
+    if (millis() - tmp_ini > 1000) {
+      noise_sum += noise;
+      loops ++;
+      Serial.print("Noise: ");
+      Serial.print(noise);
+      Serial.print(" loop: ");
+      Serial.print(loops);
+      Serial.print(" cycles: ");
+      Serial.println(cycles);
+      tmp_ini = millis(); 
+    }
+    if (noise > noise_peak) {
+      noise_peak = noise;
+      Serial.print("Noise peak: ");
+      Serial.println(noise_peak);
+    }
+    if (noise < noise_min) {
+      noise_min = noise;
+      Serial.print("Noise min: ");
+      Serial.println(noise_min);
+    }
+  }
+
+  long now_DutyCycle = millis();
+  if (now_DutyCycle - CountStart > DutyCycle) {
+    CountStart = now_DutyCycle;
+
+    // Noise calculations
+    noise_avg = int(noise_sum / loops);
+    Serial.print("Noise average: ");
+    Serial.println(noise_avg);
+    Serial.println(noise_sum);
+    Serial.println(loops);
+
+    transmitRecord();
+
+    noise_peak = 0;
+    noise_min = 1000;
+    noise_sum = 0;
+    loops = 0;
+  
+    // Low Noise Mode if two Noise Overage are under LowNoiseLevel
+    if (noise_avg < LowNoiseLevel && noise_avg_pre < LowNoiseLevel) {
+      if (lorawanClass == CLASS_A) {
+        Serial.println("Sleep");
+        lowPowerSleep(Sleep4NoNoise); 
+      }
+    } 
+    noise_avg_pre = noise_avg;
+  }
+  
 }
 
 ///////////////////////////////////////////////////
