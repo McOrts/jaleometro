@@ -17,10 +17,11 @@ Por otra parte Registra 24h al día lo que ha pasado y mostrando junto con otros
 
 ## Qué detecta y como se comunica
 
+<img src="./img/escala_dba.png" width="500" align="right"/> 
+
 El dispositivo tiene un micrófono con el que mide una vez cada segundo el nivel de ruido ambiental. Analizando la media, máxima y mínima de los valores durante diez minutos al cabo de los cuales transmitirá esta información a un servidor. 
 
-Para ello utiliza una red de transmisión inalámbrica libre y gratuita desarrollada por la iniciativa [TTN](https://www.thethingsnetwork.org/community/mallorca/). Tanto los datos transmitidos cómo la ubicación exacta del sensor están codificados asegurando su anonimato.
-<img src="./img/escala_dba.png" align="center"/> 
+Para ello utiliza una red de transmisión inalámbrica libre y gratuita desarrollada por la iniciativa [TTN](https://www.thethingsnetwork.org/community/mallorca/). Tanto los datos transmitidos cómo la ubicación exacta del sensor están codificados asegurando tu anonimato.
 
 ## Instalación
 ### ¿Dónde colocar el sensor?
