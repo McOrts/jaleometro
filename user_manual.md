@@ -26,17 +26,17 @@ Para ello utiliza una red de transmisión inalámbrica libre y gratuita desarrol
 ### ¿Dónde colocar el sensor?
 El dispositivo está construido para permanecer en el exterior con el objetivo de medir directamente el ruido ambiental. Por lo tanto busca un lugar en tu balcón o terraza con las siguientes características:
 
-- [] **Alejado de fuentes de ruido** permanente como altavoces o máquinas como aires acondicionados, lavadoras, etc...
+- [ ] **Alejado de fuentes de ruido** permanente como altavoces o máquinas como aires acondicionados, lavadoras, etc...
 
 <img src="./img/no_noise.png" width="100" align="center"/> 
 
-- [] **La orientado al Sur es lo mas importante** Aunque puede aguantar unos tres días sin iluminación. Sin la luz del sol acabará apagandose y no servirá de nada.
+- [ ] **La orientado al Sur es lo mas importante** Aunque puede aguantar unos tres días sin iluminación. Sin la luz del sol acabará apagandose y no servirá de nada.
 
 <img src="./img/Optimal-Solar-Orientation.png" width="400" align="center"/> 
 
 > ¿Cómo saber dónde está el Sur? Puedes utilizar la brújula de tu móvil o esperar a que sean las 12 horas del mediodía para colocar el Jaleómetro de manera que sus paneles miren al sol en ese momento.
 
-- [] **Cuidado con las vibraciones**. Si sujetas el sensor a un elemento que puede moverse como una barandilla o mástil. Es conveniente que utilices la pieza de espuma adhesiva entre el sensor y el soporte de metal antes de fijarlo con bridas.
+- [ ] **Cuidado con las vibraciones**. Si sujetas el sensor a un elemento que puede moverse como una barandilla o mástil. Es conveniente que utilices la pieza de espuma adhesiva entre el sensor y el soporte de metal antes de fijarlo con bridas.
 
 ### Recomendaciones y cuidados del sensor
 - Intenta mantener limpio el panel solar.
