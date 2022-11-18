@@ -1,16 +1,16 @@
 # <img src="./img/jaleometro_logo_min_transparent.png" />  Sensor remoto y autónomo de ruido ambiental 
-Este dispositivo se ha diseñado para monitorizar el ruido ambiental de forma indefinida utilizando energia solar. 
+Este dispositivo se ha diseñado para monitorizar el ruido ambiental de forma indefinida utilizando energía solar. 
 
-Por otra parte se van a utilizar comunicaciones de largo alcance tipo LPWAN (Low Power Wide Area Networks). En este caso será una modluación **LoRa** (Long Range) que además es muy eficientes en el consumo de energía. La tecnología LoRa y la capa de red abierta LoRaWAN son los protagonistas del despliegue del IoT.
+Por otra parte se van a utilizar comunicaciones de largo alcance tipo LPWAN (Low Power Wide Area Networks). En este caso será una modulación **LoRa** (Long Range) que además es muy eficientes en el consumo de energía. La tecnología LoRa y la capa de red abierta LoRaWAN son los protagonistas del despliegue del IoT.
 
 ## Material utilizado
-- Hemos utilizado la [placa Heltec HTCC-AB01](https://es.aliexpress.com/item/1005001288501966.html) para la banda ISM europea de 868MHz que tiene las siguientes caracteristicas:
+- Hemos utilizado la [placa Heltec HTCC-AB01](https://es.aliexpress.com/item/1005001288501966.html) para la banda ISM europea de 868MHz que tiene las siguientes características:
   - Compatible con Arduino, por tanto compatible en Windows, Mac OS y Linux
   - Configurable a través de comandos AT
   - Chip CP2102 de puerto serie a USB integrado
   - Basada en ASR605x (ASR6501, ASR6502) , esos chips ya están integrados el PSoC ®  4000 serie MCU (ARM ®  cortex ® M0 + Core) y SX1262;
   - Soporte de la especificación LoRaWAN 1.0.2
-  - Diseño de energía ultra bajo, sólo 3.5uA en Deep Sleep. Para este tipo de proyecto, el consumo son muy importantes y aquí tenemos es tabla que ayudará a dimensionar la bateria y el panel solar:
+  - Diseño de energía ultra bajo, sólo 3.5uA en Deep Sleep. Para este tipo de proyecto, el consumo son muy importantes y aquí tenemos es tabla que ayudará a dimensionar la batería y el panel solar:
    ![Consumos](./img/cubecell_htcc-ab01_power.png)
   - Sistema de gestión de energía solar incluido, se puede conectar directamente con un panel solar de 5-7 V
   - Conector SH1.25-2 para baterías incluido, sistema de administración de batería integrado (administración de carga y descarga, protección de sobrecarga, detección de energía de la batería, conmutación automática de energía de batería / USB)
@@ -44,18 +44,18 @@ Por otra parte también se necesitarán otros componentes no electrónicos como 
 
 ## Conexionado
 
-Del microcontrolador CubeCell sólo vamos a utilizar el pin 2 que corresponde al único conversor analógico/digital de la placa. Intermante es el mismo que utiliza para ver el estado de carga de la bateria. Por lo que perderemos esta función.  
+Del microcontrolador CubeCell sólo vamos a utilizar el pin 2 que corresponde al único conversor analógico/digital de la placa. Internamente es el mismo que utiliza para ver el estado de carga de la batería. Por lo que perderemos esta función.  
 
 <img src="./img/cubecell_htcc-ab01_pinout.png"  align="center" />
 
-Otro detalle a tener en cuenta respecto a la alimentación del sensor de sonido, es que aunque sería recomendable utilizar una tensió de 5V que suministraria la placa por el pin VIN. Este sólo tiene tensión cuando se alimenta por USB. Por lo que tendremos que utilizar el pin VDD que suministra 3.3 en la configuración de bateria y son suficientes para que el sensor funciones correctamente.
+Otro detalle a tener en cuenta respecto a la alimentación del sensor de sonido, es que aunque sería recomendable utilizar una tensión de 5V que suministraría la placa por el pin VIN. Este sólo tiene tensión cuando se alimenta por USB. Por lo que tendremos que utilizar el pin VDD que suministra 3.3 en la configuración de batería y son suficientes para que el sensor funciones correctamente.
 
 <img src="./img/jaleometro_bb.png"  align="center" />
 
 ## Configuración IDE Arduino
-Lo para poder programar adecuadamente el dispositivo tendremos que configurar el entorno de programación de Arduino con las configuraciones de hardware y librerias de esta placa.
+Lo para poder programar adecuadamente el dispositivo tendremos que configurar el entorno de programación de Arduino con las configuraciones de hardware y librerías de esta placa.
 1. Añadir la URL https://github.com/HelTecAutomation/CubeCell-Arduino/releases/download/V1.5.0/package_CubeCell_index.json a Preferences->Settings->Additional boards:
-2. Añadir la libreria de CayenneLPP. **Importante: versión 1.1.0**:
+2. Añadir la librería de CayenneLPP. **Importante: versión 1.1.0**:
 
 <img src="./img/lib_cayenne.png"  align="center" />
 
@@ -68,7 +68,7 @@ Lo para poder programar adecuadamente el dispositivo tendremos que configurar el
 <img src="./img/arduino_board_setup_cubecell.png"  align="center" />
 
 ### Subir el sketch de Arduino
-Con el cable conectado seleccionamos el puerto USB que nuestro ordenador haya asignado. Una vez compilado y cargado en el dispositvo. Abrimos el monitor serie para comprobar que log de actividad del programa es correcto.
+Con el cable conectado seleccionamos el puerto USB que nuestro ordenador haya asignado. Una vez compilado y cargado en el dispositivo. Abrimos el monitor serie para comprobar que log de actividad del programa es correcto.
 
 ## Configuración del sensor en la nube (TTN)
 
@@ -76,9 +76,9 @@ Vamos a utilizar los servicios de The Things Network que es un servicio en la nu
 La ruta de la información es la siguiente:
 1. El sensor (_nodo_) transmite por radio con modulación LoRa el trama de datos que recibe el _gateway_
 2. Este _gateway_ está conectado a internet para retransmitir la trama, hora como paquete de datos.
-3. Los servidores de TTN decodifican el mensaje y ofrecen diferentes intefraciones y _endpoints_ para que nuestras aplicaciones utilicen la información leida por los sensores.
+3. Los servidores de TTN decodifican el mensaje y ofrecen diferentes integraciones y _endpoints_ para que nuestras aplicaciones utilicen la información leída por los sensores.
 
-Hay muchas variantes para implementar este enrutamiento. Para este se ha eleguido estas configuraciones:
+Hay muchas variantes para implementar este enrutamiento. Para este se ha elegido estas configuraciones:
 - Dispositivo es del tipo ABP (Activation-by-personalisation) lo que significa que se identificará en la red con un _DevAddr_ y una _Session key_ preconfigurada. Para ello tenemos que completar el registro de una aplicación y un dispositivo. 
 - Publicación del paquete de-codificado en una cola MQTT a la que nuestra aplicación está subscrita.
 
@@ -99,7 +99,7 @@ En TTN los dispositivos (_devices_) iguales, se agrupan en una aplicación desde
 
 En el formulario de alta de aplicación rellenaremos estos campos: 
 - Para el _Application ID_, elige un identificador único, en minúsculas, puedes usar caracteres alfanuméricos peor no guiones ´-´ consecutivos.
-- Para  _Description_, elige la descripcion que prefieras.
+- Para  _Description_, elige la descripción que prefieras.
 - No hace falta poner nada en _Application EUI_ 
 - Presiona _Create application_ para finalizar
 
@@ -126,7 +126,7 @@ Al acceder al formulario de registro nos quedamos en la pestaña de _From The Lo
 Ahora tenemos que seleccionar el tipo, modelo y marca de nuestro sensor tal y como aparece en la captura inferior. 
 <img src="./img/TTN_device.png"  align="center" />
 
-El la casilla inferior vemos que pide una clave de JoinEUI que normalmente nos la daría el fabricante. Pero en nuestro caso utilzaremos una sencilla aplicación web para generarla:  https://descartes.co.uk/CreateEUIKey.html
+El la casilla inferior vemos que pide una clave de JoinEUI que normalmente nos la daría el fabricante. Pero en nuestro caso utilizaremos una sencilla aplicación web para generarla:  https://descartes.co.uk/CreateEUIKey.html
 <img src="./img/Create_random_EUI.png"  align="center" />
 
 Lo siguiente será generar la _DevEUIy  AppKey_ pulsando el icono marcado en la imagen para que se genere automáticamente.
@@ -194,7 +194,7 @@ Por último necesitaremos las credenciales de acceso al broker MQTT que TTN nos 
 ## Análisis de la señal
 Cuando hablamos de sonido o de ruido, la magnitud que se utiliza con mayor frecuencia son los dBA. Los fabricantes de dispositivos utilizan mucho esta escala logarítmica en sistemas de audio.
 Pero para llegar a esta medida, haremos varias transformaciones y calibrados.
-1.A Partimos que el sensor de sonido SparkFun Sound Detector nos da una medida analógica con un rango desde 0 a 4500. Ya que se aplica un filtro de banda alta para eliminar los _outlier_. Pero esta medida analógica no es el valor instantaneo del sonido o presión sonora. Si no la envolvente de 1 segundo de muestreo calculada por el circuito del sensor. Linea verde del gráfico:
+1.A Partimos que el sensor de sonido SparkFun Sound Detector nos da una medida analógica con un rango desde 0 a 4500. Ya que se aplica un filtro de banda alta para eliminar los _outlier_. Pero esta medida analógica no es el valor instantáneo del sonido o presión sonora. Si no la envolvente de 1 segundo de muestreo calculada por el circuito del sensor. Linea verde del gráfico:
 
 1.B Y tenemos que determinar el valor base que corresponda con la medida en silencio.
 2. Calculamos el valor medio del periodo de ciclo de transmisión que es de 10 minutos. Aunque lo correcto sería aplicar la fórmula.
@@ -218,14 +218,14 @@ En el flujo de Node-RED se tratan y muestran gráficamente los mensajes MQTT lei
 - Id de sensor en "analog_in_1"
 - Coordenadas geográficas en "gps_2"
 
-Para importar el flujo deberemos acceder a la aplicación Node-RED que tenemos arrancada donde encontraremos la opción de importar pulsando el botón de menú tipo hamburguesa. Lo más fácil es copiar al portapapeles de equipo el contenido del fichero jaleometro_nodered_ui_mqtt y pegarlo en la pantalla:
+Para importar el flujo deberemos acceder a la aplicación Node-RED que tenemos arrancada dónde encontraremos la opción de importar pulsando el botón de menú tipo hamburguesa. Lo más fácil es copiar al portapapeles de equipo el contenido del fichero jaleometro_nodered_ui_mqtt y pegarlo en la pantalla:
 
 <img src="./img/node-red_import-flow.png" width="400" align="center" />
 
 Tras pulsar el botón de ¨import¨ tendrás la vista de los nodos y los flujos. Pero hay tres de ellos que no están correctamente configurados.
 
 ### Configuración cliente MQTT
-Encontrarás todo configurado excepto las crecenciales de acceso. Para utilizar las que has obtenido en los pasos anteriores. Solo tienes que ir a las propiedades del nodo MQTT, editar el _Server_ y acceder a la pestaña _Security_:
+Encontrarás todo configurado excepto las credenciales de acceso. Para utilizar las que has obtenido en los pasos anteriores. Solo tienes que ir a las propiedades del nodo MQTT, editar el _Server_ y acceder a la pestaña _Security_:
 
 <img src="./img/jaleometro_nodered_user_mqtt.png" align="center" />
 
