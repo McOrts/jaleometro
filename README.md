@@ -10,7 +10,7 @@ Por otra parte se van a utilizar comunicaciones de largo alcance tipo LPWAN (Low
   - Chip CP2102 de puerto serie a USB integrado
   - Basada en ASR605x (ASR6501, ASR6502) , esos chips ya están integrados el PSoC ®  4000 serie MCU (ARM® cortex® M0 + Core) y SX1262;
   - Soporte de la especificación LoRaWAN 1.0.2
-  - Diseño de energía ultra bajo, sólo 3.5uA en Deep Sleep. Para este tipo de proyecto, el consumo son muy importantes y aquí tenemos es tabla que ayudará a dimensionar la batería y el panel solar:
+  - Diseño de energía ultra bajo, solo 3.5uA en Deep Sleep. Para este tipo de proyecto, el consumo son muy importantes y aquí tenemos es tabla que ayudará a dimensionar la batería y el panel solar:
    ![Consumos](./img/cubecell_htcc-ab01_power.png)
   - Sistema de gestión de energía solar incluido, se puede conectar directamente con un panel solar de 5-7 V
   - Conector SH1.25-2 para baterías incluido, sistema de administración de batería integrado (administración de carga y descarga, protección de sobrecarga, detección de energía de la batería, conmutación automática de energía de batería / USB)
@@ -44,11 +44,11 @@ Por otra parte también se necesitarán otros componentes no electrónicos como 
 
 ## Conexionado
 
-Del microcontrolador CubeCell sólo vamos a utilizar el pin 2 que corresponde al único conversor analógico/digital de la placa. Internamente es el mismo que utiliza para ver el estado de carga de la batería. Por lo que perderemos esta función.  
+Del microcontrolador CubeCell solo vamos a utilizar el pin 2 que corresponde al único conversor analógico/digital de la placa. Internamente es el mismo que utiliza para ver el estado de carga de la batería. Por lo que perderemos esta función.  
 
 <img src="./img/cubecell_htcc-ab01_pinout.png"  align="center" />
 
-Otro detalle a tener en cuenta respecto a la alimentación del sensor de sonido, es que aunque sería recomendable utilizar una tensión de 5V que suministraría la placa por el pin VIN. Este sólo tiene tensión cuando se alimenta por USB. Por lo que tendremos que utilizar el pin VDD que suministra 3.3 en la configuración de batería y son suficientes para que el sensor funciones correctamente.
+Otro detalle a tener en cuenta respecto a la alimentación del sensor de sonido, es que aunque sería recomendable utilizar una tensión de 5V que suministraría la placa por el pin VIN. Este solo tiene tensión cuando se alimenta por USB. Por lo que tendremos que utilizar el pin VDD que suministra 3.3 en la configuración de batería y son suficientes para que el sensor funciones correctamente.
 
 <img src="./img/jaleometro_bb.png"  align="center" />
 
@@ -67,7 +67,7 @@ Y finalmente en nuestro caso elegimos la de 1M para obtener una ganancia de 60 d
 
 <img src="./img/BarnizadoPCB.jpg" width="400"  align="right" />
 
-Debido a que el sensor estará fuera de la caja estanca. Aunque protegido por material plástico. Requiere de una protección especial a fin de retardar todo lo posible la oxidación de sus componentes. Hay muchas soluciones pero hemos elegido la más artesanal usando resina colofonia disuelta al 40% en alcohol isopropílico. La solución se puede aplicar con pincel y el tiempo de secado es de unas 24 horas.
+Debido a que el sensor estará fuera de la caja estanca. Aunque protegido por material plástico. Requiere de una protección especial a fin de retardar todo lo posible la oxidación de sus componentes. Hay muchas soluciones, pero hemos elegido la más artesanal usando resina colofonia disuelta al 40% en alcohol isopropílico. La solución se puede aplicar con pincel y el tiempo de secado es de unas 24 horas.
 
 ## Configuración IDE Arduino
 Lo para poder programar adecuadamente el dispositivo tendremos que configurar el entorno de programación de Arduino con las configuraciones de hardware y librerías de esta placa.
@@ -177,7 +177,7 @@ const int ReadDutyCycle = 600000; // Transmision and reading period
 
 ### Formato de la trama
 
-Desde el menú vertical izquierdo accederemos al _Payload Formatters_ y la opción Uplink para definir cómo decodificar la trama de datos de nuestro mensaje LoRa que hemos establecido en el firmware. En nuestro caso hemos usando la librería CayenneLPP y esto es lo que aquí tenemos de seleccionar como tipo:
+Desde el menú vertical izquierdo accederemos al _Payload Formatters_ y la opción Uplink para definir cómo decodificar la trama de datos de nuestro mensaje LoRa que hemos establecido en el firmware. En nuestro caso hemos usado la librería CayenneLPP y esto es lo que aquí tenemos de seleccionar como tipo:
 
 <img src="./img/TTN_app_uplink_format.png" width="400" align="center" />
 
@@ -212,7 +212,7 @@ Por último necesitaremos las credenciales de acceso al broker MQTT que TTN nos 
 Cuando hablamos de sonido o de ruido, la magnitud que se utiliza con mayor frecuencia son los dBA y la medida estandarizada para calidad ambiental es la LAeq (Equivalent Continuous Sound Pressure Level). En nuestro caso será para el tiempo dado de 10 minutos.
 Calcular este indice requiere de varias transformaciones, calibrados y cálculos que se detallan a continuación:
 
-1. (A) Partimos que el sensor de sonido _SparkFun Sound Detector_ nos da una medida analógica con un rango de 0 a 4500. Puede dar valores superiores pero aplicamos un filtro software de banda alta para eliminar los _outlier_. Si embargo esta medida analógica no es el valor instantáneo del sonido o presión sonora. Si no la envolvente de 1 segundo de muestreo calculada por el circuito del sensor. Linea verde del gráfico:
+1. (A) Partimos que el sensor de sonido _SparkFun Sound Detector_ nos da una medida analógica con un rango de 0 a 4500. Puede dar valores superiores pero aplicamos un filtro software de banda alta para eliminar los _outlier_. Si embargo esta medida analógica no es el valor instantáneo del sonido o presión sonora. Si no la envolvente de 1 segundo de muestreo calculada por el circuito del sensor. Línea verde del gráfico:
 <img src="./img/sensor_sparkfun_waves.png" align="center" />
 
 Este gráfico muestra los voltajes de salida a lo largo del tiempo.
@@ -232,11 +232,11 @@ t1 = tiempo de inicio de la medición
 t2 = tiempo de finalización de la medición
 <img src="./img/leq_chart.jpeg" align="right" />
 
-3. Finalemente para obtener el LAeq en base a la media y no al Leq anterior que sería lo correcto. Aplicamos la formula que nos dará una magnitud en decibelios:
+3. Finalmente para obtener el LAeq basándonos en la media y no al Leq anterior que sería lo correcto. Aplicamos la fórmula que nos dará una magnitud en decibelios:
 > **LAeq = Calibración * 20 * log10 ( Ruido Medio / Ruido Base )**
 
 ## Gráficas y alarmas en Node-RED
-Partimos de una instacia Node-RED con nodo para mostrar un interface de usuario que se llama _dashboard_. Lo que se puede hacer desde la opción _Manage Palette_ de la aplicación de administración.
+Partimos de una instancia Node-RED con nodo para mostrar un interface de usuario que se llama _dashboard_. Lo que se puede hacer desde la opción _Manage Palette_ de la aplicación de administración.
 
 Se ha construido un sencillo flujo para representar unas gráficas y poder establecer un umbral de alerta para enviar un mensaje a IFTTT
 
@@ -278,6 +278,6 @@ Donde sustituiremos las interrogantes por la Key que encontramos en esta configu
 
 ## Agradecimientos
 - A Christoph Hafner y Javier Maura cuyo proyecto Moix me ha servido de inspiración https://github.com/Makespace-Mallorca/moix
-- A mi ex-compañero Alexandre Coll por su buenos consejos de cómo medir el ruido https://www.linkedin.com/in/alexandre-coll-molina/
+- A mi ex-compañero Alexandre Coll por sus buenos consejos de cómo medir el ruido https://www.linkedin.com/in/alexandre-coll-molina/
 - A Sparkfun por su buena documentación: https://learn.sparkfun.com/tutorials/sik-experiment-guide-for-the-arduino-101genuino-101-board-spanish/experimento-15-usar-la-placa-de-detector-de-sonido
 
