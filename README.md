@@ -8,7 +8,7 @@ Por otra parte se van a utilizar comunicaciones de largo alcance tipo LPWAN (Low
   - Compatible con Arduino, por tanto compatible en Windows, Mac OS y Linux
   - Configurable a través de comandos AT
   - Chip CP2102 de puerto serie a USB integrado
-  - Basada en ASR605x (ASR6501, ASR6502) , esos chips ya están integrados el PSoC ®  4000 serie MCU (ARM ®  cortex ® M0 + Core) y SX1262;
+  - Basada en ASR605x (ASR6501, ASR6502) , esos chips ya están integrados el PSoC ®  4000 serie MCU (ARM® cortex® M0 + Core) y SX1262;
   - Soporte de la especificación LoRaWAN 1.0.2
   - Diseño de energía ultra bajo, sólo 3.5uA en Deep Sleep. Para este tipo de proyecto, el consumo son muy importantes y aquí tenemos es tabla que ayudará a dimensionar la batería y el panel solar:
    ![Consumos](./img/cubecell_htcc-ab01_power.png)
@@ -51,6 +51,23 @@ Del microcontrolador CubeCell sólo vamos a utilizar el pin 2 que corresponde al
 Otro detalle a tener en cuenta respecto a la alimentación del sensor de sonido, es que aunque sería recomendable utilizar una tensión de 5V que suministraría la placa por el pin VIN. Este sólo tiene tensión cuando se alimenta por USB. Por lo que tendremos que utilizar el pin VDD que suministra 3.3 en la configuración de batería y son suficientes para que el sensor funciones correctamente.
 
 <img src="./img/jaleometro_bb.png"  align="center" />
+
+### Tuneo del sensor de Sparkfun
+Las pruebas realizadas con la v0 revelaron falta de sensibilidad. El sensor permite esta ajuste por hardware soldando una resistencia en este punto:
+
+<img src="./img/sensor_sparkfun_sensor_position.jpeg" width="300"  align="center" />
+
+Los valores posibles están en esta tabla:
+
+<img src="./img/sensor_sparkfun_resistor_table.png"  align="center" />
+
+Y finalmente en nuestro caso elegimos la de 1M para obtener una ganancia de 60 dB:
+
+<img src="./img/sensor_sparkfun_sensor_resistor.png" width="300"  align="center" />
+
+<img src="./img/BarnizadoPCB.jpg" width="400"  align="right" />
+
+Debido a que el sensor estará fuera de la caja estanca. Aunque protegido por material plástico. Requiere de una protección especial a fin de retardar todo lo posible la oxidación de sus componentes. Hay muchas soluciones pero hemos elegido la más artesanal usando resina colofonia disuelta al 40% en alcohol isopropílico. La solución se puede aplicar con pincel y el tiempo de secado es de unas 24 horas.
 
 ## Configuración IDE Arduino
 Lo para poder programar adecuadamente el dispositivo tendremos que configurar el entorno de programación de Arduino con las configuraciones de hardware y librerías de esta placa.
