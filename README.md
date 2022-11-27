@@ -192,14 +192,31 @@ Por último necesitaremos las credenciales de acceso al broker MQTT que TTN nos 
 **IMPORTANTE**: copia el password ahora porque una vez cerrada esta ventana. No tendrás opción a consultarlo.
 
 ## Análisis de la señal
-Cuando hablamos de sonido o de ruido, la magnitud que se utiliza con mayor frecuencia son los dBA. Los fabricantes de dispositivos utilizan mucho esta escala logarítmica en sistemas de audio.
-Pero para llegar a esta medida, haremos varias transformaciones y calibrados.
-1.A Partimos que el sensor de sonido SparkFun Sound Detector nos da una medida analógica con un rango desde 0 a 4500. Ya que se aplica un filtro de banda alta para eliminar los _outlier_. Pero esta medida analógica no es el valor instantáneo del sonido o presión sonora. Si no la envolvente de 1 segundo de muestreo calculada por el circuito del sensor. Linea verde del gráfico:
+Cuando hablamos de sonido o de ruido, la magnitud que se utiliza con mayor frecuencia son los dBA y la medida estandarizada para calidad ambiental es la LAeq (Equivalent Continuous Sound Pressure Level). En nuestro caso será para el tiempo dado de 10 minutos.
+Calcular este indice requiere de varias transformaciones, calibrados y cálculos que se detallan a continuación:
 
-1.B Y tenemos que determinar el valor base que corresponda con la medida en silencio.
-2. Calculamos el valor medio del periodo de ciclo de transmisión que es de 10 minutos. Aunque lo correcto sería aplicar la fórmula.
-3. msg.noise_LAeq = noise_calibration * 20 * Math.log10(Number(noise_avg)/noise_baseline);
+1. (A) Partimos que el sensor de sonido _SparkFun Sound Detector_ nos da una medida analógica con un rango de 0 a 4500. Puede dar valores superiores pero aplicamos un filtro software de banda alta para eliminar los _outlier_. Si embargo esta medida analógica no es el valor instantáneo del sonido o presión sonora. Si no la envolvente de 1 segundo de muestreo calculada por el circuito del sensor. Linea verde del gráfico:
+<img src="./img/sensor_sparkfun_waves.png" align="center" />
 
+Este gráfico muestra los voltajes de salida a lo largo del tiempo.
+- El trazo verde oscuro es la salida de audio del detector de sonido. El voltaje de audio directamente desde el micrófono se encuentra en esta salida.
+- El trazo verde claro es la envolvente. Este voltaje analógico rastrea la amplitud del sonido. Se puede observar que el tercer pulso se vuelve notablemente más fuerte a medida que avanza.
+- Finalmente, la línea roja es la salida de la puerta. Esta salida es baja cuando las condiciones son tranquilas y aumenta cuando se detecta sonido.
+1. (B) Y tenemos que determinar el valor base que corresponda con la medida en silencio.
+2. Calculamos el ruido medio del periodo de ciclo de transmisión que es de 10 minutos. 
+
+<img src="./img/leq_formula.jpeg" align="right" />
+
+Donde:
+Leq = nivel de presión sonora continuo equivalente en dB
+p0 = nivel de presión de referencia (típicamente 20 µPa)
+pA = presión sonora adquirida
+t1 = tiempo de inicio de la medición
+t2 = tiempo de finalización de la medición
+<img src="./img/leq_chart.jpeg" align="right" />
+
+3. Finalemente para obtener el LAeq en base a la media y no al Leq anterior que sería lo correcto. Aplicamos la formula que nos dará una magnitud en decibelios:
+> **LAeq = Calibración * 20 * log10 ( Ruido Medio / Ruido Base )**
 
 ## Gráficas y alarmas en Node-RED
 Partimos de una instacia Node-RED con nodo para mostrar un interface de usuario que se llama _dashboard_. Lo que se puede hacer desde la opción _Manage Palette_ de la aplicación de administración.
@@ -244,6 +261,6 @@ Donde sustituiremos las interrogantes por la Key que encontramos en esta configu
 
 ## Agradecimientos
 - A Christoph Hafner y Javier Maura cuyo proyecto Moix me ha servido de inspiración https://github.com/Makespace-Mallorca/moix
-- A mi compañero Alexandre Coll por su buenos consejos de cómo medir el ruido https://www.linkedin.com/in/alexandre-coll-molina/
+- A mi ex-compañero Alexandre Coll por su buenos consejos de cómo medir el ruido https://www.linkedin.com/in/alexandre-coll-molina/
 - A Sparkfun por su buena documentación: https://learn.sparkfun.com/tutorials/sik-experiment-guide-for-the-arduino-101genuino-101-board-spanish/experimento-15-usar-la-placa-de-detector-de-sonido
 
