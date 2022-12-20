@@ -1,0 +1,87 @@
+{
+  "jaleometros": [
+    {
+      "ttn_device_id": "jaleometro-1005",
+      "sencom_x_sensor": "TTN-2002",
+      "sencom_sensor_id": 73956,
+      "name": "jaleometro-1002-azul",
+      "owner": {
+        "name": "NINA",
+        "surname": "PARRÓN",
+        "phone": 659045918,
+        "email": "towanda89@hotmail.com"
+      },
+      "address": "Llotgeta",
+      "number": 7,
+      "flat": 1,
+      "latitude": 39.57093438859319,
+      "latitude": "39.544",
+      "longitude": "2.653670848075559",
+      "ground_level": 12,
+      "issue": "Oci Nocturn",
+      "location": "Balcó"
+  },
+  {
+    "": 1003,
+      "ttn_device_id": "jaleometro-1003",
+      "sencom_x_sensor": "TTN-1003",
+      "sencom_sensor_id": 73956,
+      "name": "jaleometro-1002-azul",
+      "owner": {
+        "name": "Jordi",
+    "__1": "BAYONA",
+    "__2": 638127693,
+    "__3": "jordibayo@yahoo.es",
+    "__4": "Pes Formatge",
+    "__5": 2,
+    "__6": "1B",
+    "__7": "39.570569, 2.653495",
+    "__8": 5,
+    "__9": "Oci Nocturn",
+    "__10": "Balcó"
+  },
+  {
+    "": 1004,
+    "Sensor Soroll": "Mariano",
+    "__1": "Sbert",
+    "__2": 606520600,
+    "__3": "msbertb@gmail.com",
+    "__4": "Corderia",
+    "__5": 15,
+    "__6": "5è",
+    "__7": "39.57052181046839, 2.652869339830219",
+    "__8": 15,
+    "__9": "Sensor referencial sin ruido",
+    "__10": "terrassa"
+  },
+  {
+    "": 1005,
+    "Sensor Soroll": "Carme",
+    "__1": "Verdaguer",
+    "__2": 646203815,
+    "__3": "carme@peplemon.com",
+    "__4": "Moliners",
+    "__5": 5,
+    "__6": "3è",
+    "__7": "39.5726447770259, 2.652504173970349",
+    "__8": 12,
+    "__9": "Ruido Obras",
+    "__10": "Balcó"
+  },
+  {
+    "": 1006,
+    "Sensor Soroll": "Clara",
+    "__1": "Ingold",
+    "__2": "",
+    "__3": "",
+    "__4": "Corderia",
+    "__5": 15,
+    "__6": "1è",
+    "__7": "39.57046579260317, 2.652842424622102",
+    "__8": 5,
+    "__9": "Trànsit rodat",
+    "__10": "Balcó"
+  }
+
+  ]
+}
