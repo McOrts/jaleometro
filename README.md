@@ -146,7 +146,7 @@ Ahora tenemos que seleccionar el tipo, modelo y marca de nuestro sensor tal y co
 El la casilla inferior vemos que pide una clave de JoinEUI que normalmente nos la daría el fabricante. Pero en nuestro caso utilizaremos una sencilla aplicación web para generarla:  https://descartes.co.uk/CreateEUIKey.html
 <img src="./img/Create_random_EUI.png"  align="center" />
 
-Lo siguiente será generar la _DevEUIy  AppKey_ pulsando el icono marcado en la imagen para que se genere automáticamente.
+Lo siguiente será generar las _DevEUI_ y _AppKey_ pulsando los correspondientes iconos de la derecha para que se genere automáticamente.
 Finalmente queda rellenar el _Device ID_ que será el nombre único de este nodo.
 
 <img src="./img/TTN_device_keys.png"  align="center" />
