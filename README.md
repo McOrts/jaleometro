@@ -155,24 +155,30 @@ Finalmente pulsaremos _Register en device_ para que, seguidamente aparezca la pa
 
 <img src="./img/TTN_device_created.png"  align="center" />
 
-Para poder copiar las _keys_ en el formato "array" que se requiere en el fichero de configuración. Hay que pulsar el icono <> de "_toggle array formating_"
+Para poder copiar las _keys_ en el formato "array" que se requiere en el fichero de configuración: "settings.h" 
+Nota: hay que pulsar el icono <> de "_toggle array formating_" para tener el formato adecuado para este fichero.
 
 ```cpp
 // LoRaWAN Configuration
 
-/* ABP para*/
-uint8_t nwkSKey[] = { 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x66, 0x01 };
-uint8_t appSKey[] = { 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x88, 0x66, 0x01 };
-uint32_t devAddr =  ( uint32_t )0x00000000;
+/* OTAA para*/
+static uint8_t devEui[] = {  };
+static uint8_t appEui[] = {  };
+static uint8_t appKey[] = {  };
+
+uint16_t userChannelsMask[6]={ 0x00FF,0x0000,0x0000,0x0000,0x0000,0x0000 };
+static DeviceClass_t lorawanClass = LORAWAN_CLASS;
 
 // Devise location
-const float latitude = 39.936;
-const float longitude = 3.718;
-const int alt = 30;
+const float latitude = 39.573;
+const float longitude = 2.732;
+const int alt = 20;
 
 // Other params
-float SensorId= 10.02;// Sensor  identifcator number 
-const int ReadDutyCycle = 600000; // Transmision and reading period
+float SensorId= 10.01;// Sensor  identifcator number 
+const int DutyCycle = 600000; // Transmision and reading period
+const int Sleep4NoNoise = 300000; // Sleep period when low noise 
+const int LowNoiseLevel = 180; // Limit for low noise mode
 ```
 
 ### Formato de la trama
