@@ -17,6 +17,8 @@ unsigned int noise_min; // noise minimun value
 unsigned int noise; // current noise value
 unsigned long noise_sum; // noise level addition
 
+uint16_t battery;
+
 unsigned long tmp_ini; 
 long CountStart = 0;
 long now_DutyCycle = 0;
@@ -50,11 +52,22 @@ static void lowPowerSleep(uint32_t sleeptime)
 void setup() {
 	Serial.begin(115200);
 
+  // This enables (with LOW) the output to power the sensor
+  pinMode(Vext, OUTPUT);
+  digitalWrite(Vext, LOW);
+  Serial.printf(" | Vext: ");
+  Serial.println(digitalRead(Vext));
+  delay(500);
+
+  // Sensor identification
+  Serial.printf(" | SensorId: ");
+  Serial.println(SensorId);
+
   tmp_ini = millis(); 
   noise_avg = 0;
   noise_avg_pre = LowNoiseLevel;
   noise_peak = 0;
-  noise_min = 1000;  
+  noise_min = 1000; 
   noise_sum = 0;
   loops = 0;
   cycles = 50;
@@ -80,10 +93,16 @@ void setup() {
       Serial.println("JOIN FAILED! Sleeping for 60 seconds");
       lowPowerSleep(60000);
     } else {
-      Serial.println("JOINED");
+        Serial.println("JOINED");
+        if (LORAWAN_CLASS == CLASS_A) {
+          Serial.println("CLASS A Confirmed");
+        } else {
+           Serial.println("ERROR MOT CLASS A");
+        }
       break;
     }
   }
+
 }
 
 void transmitRecord()
@@ -109,6 +128,7 @@ void transmitRecord()
   lpp.reset();
   lpp.addAnalogInput(1,SensorId);
   lpp.addAnalogInput(2,cycles);
+  lpp.addAnalogInput(3,battery);
   lpp.addLuminosity(1, noise_avg);
   lpp.addLuminosity(2, noise_peak);
   lpp.addLuminosity(3, noise_min);    
@@ -130,14 +150,18 @@ void transmitRecord()
   }
 }
 ///////////////////////////////////////////////////
-void loop()
-{
-
+void loop() {
   // Noise reading each second
-  noise = analogRead(ADC );
-  if (noise > 4500) {
-    Serial.println("outlier removed");
+  if (digitalRead(Vext) == 0) {
+    noise = analogReadmV(ADC);
   } else {
+      digitalWrite(Vext, LOW);
+  }
+
+  if (noise > 4500) {
+    Serial.print("outlier removed: ");
+    Serial.println(noise);
+ } else {
     if (millis() - tmp_ini > 1000) {
       noise_sum += noise;
       loops ++;
@@ -172,6 +196,15 @@ void loop()
     Serial.println(noise_sum);
     Serial.println(loops);
 
+    // Swith off-on the power of the sensor in order to read the battery
+    digitalWrite(Vext, HIGH);
+    delay(1000);
+    battery = getBatteryVoltage();
+    digitalWrite(Vext, LOW);
+    Serial.print("Battery: ");
+    Serial.println(battery);
+    delay(100);
+
     transmitRecord();
 
     noise_peak = 0;
@@ -181,15 +214,20 @@ void loop()
   
     // Low Noise Mode if two Noise Overage are under LowNoiseLevel
     if (noise_avg < LowNoiseLevel && noise_avg_pre < LowNoiseLevel) {
-      if (lorawanClass == CLASS_A) {
+      if (LORAWAN_CLASS == CLASS_A) {
         cycles -= icycles;
+        digitalWrite(Vext, HIGH);
+        Serial.println("Switch OFF Micro");
         Serial.println("Sleep");
+        delay(400);
+
         lowPowerSleep(Sleep4NoNoise); 
+        digitalWrite(Vext, LOW);
+        Serial.println("Switch ON Micro");
       }
     } 
     noise_avg_pre = noise_avg;
   }
-  
 }
 
 ///////////////////////////////////////////////////
