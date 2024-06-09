@@ -17,4 +17,4 @@ const int alt = 5;
 
 // Other params
 float SensorId= 10.06;// Sensor  identifcator number 
-const int ReadDutyCycle = 60000; // Transmision and reading period ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+const int ReadDutyCycle = 60000; // Transmision and reading period
