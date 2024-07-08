@@ -7,6 +7,9 @@
 #include "Arduino.h"
 #include "settings.h"
 
+#define Pin_LED_Red GPIO0
+#define Pin_LED_Green GPIO4
+
 int loops; // number of readings
 float cycles; // number of read and transmisions cycles.
 float icycles; // delta for cycles counter.
@@ -52,6 +55,13 @@ static void lowPowerSleep(uint32_t sleeptime)
 void setup() {
 	Serial.begin(115200);
 
+if (moix == true) {
+  // initialize digital pin for LED as an output.
+  pinMode(Pin_LED_Red, OUTPUT);
+  digitalWrite(Pin_LED_Red, LOW);
+  pinMode(Pin_LED_Green, OUTPUT);
+  digitalWrite(Pin_LED_Green, HIGH);
+}
   // This enables (with LOW) the output to power the sensor
   pinMode(Vext, OUTPUT);
   digitalWrite(Vext, LOW);
@@ -172,6 +182,17 @@ void loop() {
       Serial.print(" cycles: ");
       Serial.println(cycles);
       tmp_ini = millis(); 
+      // LED control of MOIX
+      if (moix == true && noise > MoixRedLevel) {
+        digitalWrite(Pin_LED_Green, LOW);
+        digitalWrite(Pin_LED_Red, HIGH);
+        Serial.println("Red");
+      } else {
+        digitalWrite(Pin_LED_Red, LOW);
+        digitalWrite(Pin_LED_Green, HIGH);
+        Serial.println("Green");
+      }
+
     }
     if (noise > noise_peak) {
       noise_peak = noise;
@@ -219,8 +240,9 @@ void loop() {
         digitalWrite(Vext, HIGH);
         Serial.println("Switch OFF Micro");
         Serial.println("Sleep");
+        digitalWrite(Pin_LED_Red, LOW);
+        digitalWrite(Pin_LED_Green, LOW);
         delay(400);
-
         lowPowerSleep(Sleep4NoNoise); 
         digitalWrite(Vext, LOW);
         Serial.println("Switch ON Micro");
