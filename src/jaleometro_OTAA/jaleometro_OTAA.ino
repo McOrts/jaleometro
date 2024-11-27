@@ -3,7 +3,7 @@
  * Carlos Orts
  */
 #include "LoRaWanMinimal_APP.h"
-#include <CayenneLPP.h>//the library is needed https://github.com/ElectronicCats/CayenneLPP
+#include <CayenneLPP.h>//the library needed is https://github.com/ElectronicCats/CayenneLPP with version 1.0.1
 #include "Arduino.h"
 #include "settings.h"
 
@@ -183,16 +183,17 @@ void loop() {
       Serial.println(cycles);
       tmp_ini = millis(); 
       // LED control of MOIX
-      if (moix == true && noise > MoixRedLevel) {
-        digitalWrite(Pin_LED_Green, LOW);
-        digitalWrite(Pin_LED_Red, HIGH);
-        Serial.println("Red");
-      } else {
-        digitalWrite(Pin_LED_Red, LOW);
-        digitalWrite(Pin_LED_Green, HIGH);
-        Serial.println("Green");
+      if (moix == true) {
+        if (noise > MoixRedLevel) {
+          digitalWrite(Pin_LED_Green, LOW);
+          digitalWrite(Pin_LED_Red, HIGH);
+          Serial.println("Red");
+        } else {
+          digitalWrite(Pin_LED_Red, LOW);
+          digitalWrite(Pin_LED_Green, HIGH);
+          Serial.println("Green");
+        }
       }
-
     }
     if (noise > noise_peak) {
       noise_peak = noise;
