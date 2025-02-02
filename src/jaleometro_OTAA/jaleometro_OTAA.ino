@@ -19,12 +19,18 @@ unsigned int noise_peak; // noise peak value
 unsigned int noise_min; // noise minimun value
 unsigned int noise; // current noise value
 unsigned long noise_sum; // noise level addition
+unsigned long tmp_ini; 
+
+int loops_legal; // number of readings
+float noise_avg_legal; // noise level average PMI
+float noise_avg_legal_max; // noise level average PMI previous
+unsigned int noise_avg_legal_period = 5000; // period of time in miliseconds for legal measurement 
+unsigned long noise_sum_legal; // noise level addition
+long LegalStart = 0;
 
 uint16_t battery;
 
-unsigned long tmp_ini; 
 long CountStart = 0;
-long now_DutyCycle = 0;
 
 CayenneLPP lpp(LORAWAN_APP_DATA_MAX_SIZE);//if use AT mode, don't modify this value or may run dead https://github.com/HelTecAutomation/CubeCell-Arduino/search?q=commissioning.h
 
@@ -74,15 +80,19 @@ if (moix == true) {
   Serial.println(SensorId);
 
   tmp_ini = millis(); 
-  noise_avg = 0;
+  noise_avg = LowNoiseLevel;
+  noise_avg_legal = LowNoiseLevel;
   noise_avg_pre = LowNoiseLevel;
+  noise_avg_legal_max = LowNoiseLevel;
   noise_peak = 0;
   noise_min = 1000; 
   noise_sum = 0;
+  noise_sum_legal = 0;
   loops = 0;
+  loops_legal = 0;
   cycles = 50;
   icycles = 1;
-  noise_avg = LowNoiseLevel;
+
 
   if (ACTIVE_REGION==LORAMAC_REGION_AU915) {
     //TTN uses sub-band 2 in AU915
@@ -130,6 +140,8 @@ void transmitRecord()
   if (cycles>99) {
     icycles = -1 ;
   } else if (cycles<1){
+    // re-iniciate the LowNoiseLevel to avoid low levels like 0
+    LowNoiseLevel = noise_min;
     icycles = +1 ;
   }
   cycles += icycles;
@@ -139,10 +151,12 @@ void transmitRecord()
   lpp.addAnalogInput(1,SensorId);
   lpp.addAnalogInput(2,cycles);
   lpp.addAnalogInput(3,battery);
+  lpp.addAnalogInput(4,LowNoiseLevel);
   lpp.addLuminosity(1, noise_avg);
   lpp.addLuminosity(2, noise_peak);
   lpp.addLuminosity(3, noise_min);    
-  lpp.addGPS(2, latitude, longitude, alt);
+  lpp.addLuminosity(4, noise_avg_legal_max);    
+  //lpp.addGPS(2, latitude, longitude, alt);
 
   Serial.println("Transmiting...");
   Serial.print("lpp data size: ");
@@ -168,13 +182,21 @@ void loop() {
       digitalWrite(Vext, LOW);
   }
 
+  // ++++++++++++++  Remove outlier ++++++++++++++++
   if (noise > 4500) {
     Serial.print("outlier removed: ");
     Serial.println(noise);
- } else {
+  } else { 
+    // Recalculate the LowNoiseLevel
+    if (noise < LowNoiseLevel) {
+      LowNoiseLevel = noise;
+    }
+    
+    // ++++++++++++++  LAeq based on samples taken every second ++++++++++++++++
     if (millis() - tmp_ini > 1000) {
       noise_sum += noise;
       loops ++;
+
       Serial.print("Noise: ");
       Serial.print(noise);
       Serial.print(" loop: ");
@@ -182,9 +204,30 @@ void loop() {
       Serial.print(" cycles: ");
       Serial.println(cycles);
       tmp_ini = millis(); 
+    }
+
+    // ++++++++++++++  Noise legal calculations ++++++++++++++++
+    loops_legal ++;
+    noise_sum_legal += noise;
+    if (millis() - LegalStart > noise_avg_legal_period) {
+
+      noise_avg_legal = int(noise_sum_legal / loops_legal);
+      Serial.print("   (Legal) noise_avg_legal: ");
+      Serial.print(noise_avg_legal);
+      Serial.print(" noise_avg_legal_max: ");
+      Serial.print(noise_avg_legal_max);
+      Serial.print(" loops: ");
+      Serial.println(loops_legal);
+
+      if (noise_avg_legal > noise_avg_legal_max) {
+        noise_avg_legal_max = noise_avg_legal;
+        Serial.print("Noise legal current average: ");
+        Serial.println(noise_avg_legal_max);
+      }
+
       // LED control of MOIX
       if (moix == true) {
-        if (noise > MoixRedLevel) {
+        if (noise_avg_legal > MoixRedLevel) {
           digitalWrite(Pin_LED_Green, LOW);
           digitalWrite(Pin_LED_Red, HIGH);
           Serial.println("Red");
@@ -194,7 +237,13 @@ void loop() {
           Serial.println("Green");
         }
       }
+
+      loops_legal = 0;
+      noise_sum_legal = 0;
+      LegalStart = millis();
     }
+
+    // ++++++++++++++  Maximun and Minimun detection ++++++++++++++++ 
     if (noise > noise_peak) {
       noise_peak = noise;
       Serial.print("Noise peak: ");
@@ -207,9 +256,8 @@ void loop() {
     }
   }
 
-  long now_DutyCycle = millis();
-  if (now_DutyCycle - CountStart > DutyCycle) {
-    CountStart = now_DutyCycle;
+  if (millis() - CountStart > DutyCycle) {
+    CountStart = millis();
 
     // Noise calculations
     noise_avg = int(noise_sum / loops);
@@ -220,7 +268,7 @@ void loop() {
 
     // Swith off-on the power of the sensor in order to read the battery
     digitalWrite(Vext, HIGH);
-    delay(1000);
+    delay(500);
     battery = getBatteryVoltage();
     digitalWrite(Vext, LOW);
     Serial.print("Battery: ");
@@ -233,9 +281,10 @@ void loop() {
     noise_min = 1000;
     noise_sum = 0;
     loops = 0;
+    noise_avg_legal_max = 0;
   
-    // Low Noise Mode if two Noise Overage are under LowNoiseLevel
-    if (noise_avg < LowNoiseLevel && noise_avg_pre < LowNoiseLevel) {
+    // Low Noise Mode if two Noise Overage are under LowNoiseLevel 
+    if (noise_avg < LowNoiseLevel+3 && noise_avg_pre < LowNoiseLevel+3 && indoor == false) {
       if (LORAWAN_CLASS == CLASS_A) {
         cycles -= icycles;
         digitalWrite(Vext, HIGH);
@@ -248,6 +297,7 @@ void loop() {
         digitalWrite(Vext, LOW);
         Serial.println("Switch ON Micro");
       }
+      CountStart = millis();
     } 
     noise_avg_pre = noise_avg;
   }
