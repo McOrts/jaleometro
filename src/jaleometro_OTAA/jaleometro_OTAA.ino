@@ -61,19 +61,20 @@ static void lowPowerSleep(uint32_t sleeptime)
 void setup() {
 	Serial.begin(115200);
 
-if (moix == true) {
-  // initialize digital pin for LED as an output.
-  pinMode(Pin_LED_Red, OUTPUT);
-  digitalWrite(Pin_LED_Red, LOW);
-  pinMode(Pin_LED_Green, OUTPUT);
-  digitalWrite(Pin_LED_Green, HIGH);
-}
-  // This enables (with LOW) the output to power the sensor
+  // This disabled (with HIGH) the power of the microphone
   pinMode(Vext, OUTPUT);
-  digitalWrite(Vext, LOW);
+  digitalWrite(Vext, HIGH );
   Serial.printf(" | Vext: ");
   Serial.println(digitalRead(Vext));
   delay(500);
+
+  if (moix == true) {
+    // initialize digital pin for LED as an output.
+    pinMode(Pin_LED_Red, OUTPUT);
+    digitalWrite(Pin_LED_Red, LOW);
+    pinMode(Pin_LED_Green, OUTPUT);
+    digitalWrite(Pin_LED_Green, HIGH);
+  }
 
   // Sensor identification
   Serial.printf(" | SensorId: ");
@@ -113,12 +114,14 @@ if (moix == true) {
       Serial.println("JOIN FAILED! Sleeping for 60 seconds");
       lowPowerSleep(60000);
     } else {
-        Serial.println("JOINED");
-        if (LORAWAN_CLASS == CLASS_A) {
-          Serial.println("CLASS A Confirmed");
-        } else {
-           Serial.println("ERROR MOT CLASS A");
-        }
+      Serial.println("JOINED");
+      // This enable (with LOW) the power of the microphone
+      digitalWrite(Vext, LOW );
+      if (LORAWAN_CLASS == CLASS_A) {
+        Serial.println("CLASS A Confirmed");
+      } else {
+          Serial.println("ERROR MOT CLASS A");
+      }
       break;
     }
   }
@@ -173,6 +176,7 @@ void transmitRecord()
     Serial.println("Send FAILED");
   }
 }
+
 ///////////////////////////////////////////////////
 void loop() {
   // Noise reading each second
@@ -266,7 +270,7 @@ void loop() {
     Serial.println(noise_sum);
     Serial.println(loops);
 
-    // Swith off-on the power of the sensor in order to read the battery
+    // Swith off-on the power of the microphone in order to read the battery
     digitalWrite(Vext, HIGH);
     delay(500);
     battery = getBatteryVoltage();
@@ -288,14 +292,14 @@ void loop() {
       if (LORAWAN_CLASS == CLASS_A) {
         cycles -= icycles;
         digitalWrite(Vext, HIGH);
-        Serial.println("Switch OFF Micro");
+        Serial.println("Switch OFF Microphone");
         Serial.println("Sleep");
         digitalWrite(Pin_LED_Red, LOW);
         digitalWrite(Pin_LED_Green, LOW);
         delay(400);
         lowPowerSleep(Sleep4NoNoise); 
         digitalWrite(Vext, LOW);
-        Serial.println("Switch ON Micro");
+        Serial.println("Switch ON Microphone");
       }
       CountStart = millis();
     } 
