@@ -288,7 +288,7 @@ void loop() {
     noise_avg_legal_max = 0;
   
     // Low Noise Mode if two Noise Overage are under LowNoiseLevel 
-    if (noise_avg < LowNoiseLevel+3 && noise_avg_pre < LowNoiseLevel+3 && indoor == false) {
+    if (noise_avg < LowNoiseLevel + noiseDiffSleep && noise_avg_pre < LowNoiseLevel + noiseDiffSleep && indoor == false) {
       if (LORAWAN_CLASS == CLASS_A) {
         cycles -= icycles;
         digitalWrite(Vext, HIGH);
@@ -314,6 +314,9 @@ void downLinkDataHandle(McpsIndication_t *mcpsIndication)
   Serial.printf("Received downlink: %s, RXSIZE %d, PORT %d, DATA: ",mcpsIndication->RxSlot?"RXWIN2":"RXWIN1",mcpsIndication->BufferSize,mcpsIndication->Port);
   for(uint8_t i=0;i<mcpsIndication->BufferSize;i++) {
     Serial.printf("%02X",mcpsIndication->Buffer[i]);
+    if (mcpsIndication->Port == 1) {
+      noiseDiffSleep = mcpsIndication->Buffer[i];
+    }
   }
   Serial.println();
 }

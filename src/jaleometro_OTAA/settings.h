@@ -18,6 +18,7 @@ float SensorId= 00.00;// Sensor  identifcator number
 const int DutyCycle = 120000; // Transmision and reading period
 const int Sleep4NoNoise = 300000; // Sleep period when low noise 
 int LowNoiseLevel = 34; // Limit for low noise mode
+int noiseDiffSleep = 4; // UPDATED by downlink Port 1. Is the difference in sound level between the 
 const bool moix = false;
 const int MoixRedLevel = 41; // Limit for low noise mode
 const bool indoor = false;
