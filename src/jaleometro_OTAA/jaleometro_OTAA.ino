@@ -136,7 +136,7 @@ void setup() {
   }
 
   tmp_ini = millis(); 
-  CountStart = millis();
+  CountStart = millis();  
   noise_avg = LowNoiseLevel;
   noise_avg_legal = LowNoiseLevel;
   noise_avg_pre = LowNoiseLevel;
@@ -177,8 +177,8 @@ void transmitRecord()
 
   //lpp.addGPS(2, latitude, longitude, alt);
 
-  Serial.println("Transmiting...");
-  Serial.print("lpp data size: ");
+  Serial.println("  Transmiting...");
+  Serial.print("  lpp data size: ");
   Serial.print(lpp.getSize());
   Serial.println();
   
@@ -187,9 +187,9 @@ void transmitRecord()
   
   // if (LoRaWAN.send(1, lpp.getBuffer(), lpp.getSize(), requestack)) {
   if (LoRaWAN.send(lpp.getSize(), lpp.getBuffer(), 2, requestack)) {
-    Serial.println("Send OK");
+    Serial.println("  Send OK");
   } else {
-    Serial.println("Send FAILED");
+    Serial.println("  Send FAILED");
   }
 }
 
@@ -199,7 +199,7 @@ void loop() {
   if (digitalRead(Vext) == 0) {
     noise = analogReadmV(ADC);
   } else {
-      digitalWrite(Vext, LOW);
+    digitalWrite(Vext, LOW);
   }
 
   // ++++++++++++++  Remove outlier ++++++++++++++++
@@ -221,8 +221,10 @@ void loop() {
       Serial.print(noise);
       Serial.print(" loop: ");
       Serial.print(loops);
-      Serial.print(" cycles: ");
-      Serial.println(cycles);
+      Serial.print(" cycle: ");
+      Serial.print(cycles);
+      Serial.print(" loops_legal: ");
+      Serial.println(loops_legal); 
       tmp_ini = millis(); 
     }
 
@@ -230,20 +232,23 @@ void loop() {
     loops_legal ++;
     noise_sum_legal += noise;
     if (millis() - LegalStart > noise_avg_legal_period) {
+      Serial.print(" Legal time: ");
+      Serial.println(millis() - LegalStart);
+      LegalStart = millis();
 
       noise_avg_legal = int(noise_sum_legal / loops_legal);
+      if (noise_avg_legal > noise_avg_legal_max) {
+        noise_avg_legal_max = noise_avg_legal;
+        Serial.print("  Noise legal current maximum: ");
+        Serial.println(noise_avg_legal_max);
+      }
+
       Serial.print("   (Legal) noise_avg_legal: ");
       Serial.print(noise_avg_legal);
       Serial.print(" noise_avg_legal_max: ");
       Serial.print(noise_avg_legal_max);
-      Serial.print(" loops: ");
+      Serial.print(" samples: ");
       Serial.println(loops_legal);
-
-      if (noise_avg_legal > noise_avg_legal_max) {
-        noise_avg_legal_max = noise_avg_legal;
-        Serial.print("Noise legal current average: ");
-        Serial.println(noise_avg_legal_max);
-      }
 
       // LED control of MOIX
       if (moixMode) {
@@ -260,7 +265,6 @@ void loop() {
 
       loops_legal = 0;
       noise_sum_legal = 0;
-      LegalStart = millis();
     }
 
     // ++++++++++++++  Maximun and Minimun detection ++++++++++++++++ 
@@ -269,7 +273,7 @@ void loop() {
       Serial.print("Noise peak: ");
       Serial.println(noise_peak);
     }
-    if (noise < noise_min) {
+    if (noise < noise_min  && loops > 5) { // loops>5 because after the power ON of the micro, the A/D port read low values an the begining 
       noise_min = noise;
       Serial.print("Noise min: ");
       Serial.println(noise_min);
@@ -277,22 +281,26 @@ void loop() {
   }
 
   if (millis() - CountStart > DutyCycle) {
+    Serial.print(" DutyCycle time: ");
+    Serial.println(millis() - CountStart);
     CountStart = millis();
 
     // Noise calculations
     noise_avg = int(noise_sum / loops);
-    Serial.print("Noise average: ");
+    Serial.print("  Noise average: ");
     Serial.println(noise_avg);
-    Serial.print("Noise sum: ");
+    Serial.print("  Noise sum: ");
     Serial.println(noise_sum);
-    Serial.print("Loops: ");
+    Serial.print("  Noise min: ");
+    Serial.println(noise_min);
+    Serial.print("  Samples: ");
     Serial.println(loops);
 
     // Swith off-on the power of the microphone in order to read the battery
     digitalWrite(Vext, HIGH);
     delay(500);
     battery = getBatteryVoltage();
-    Serial.print("Battery: ");
+    Serial.print("  Battery: ");
     Serial.println(battery);
     battery = battery / 100;
 
@@ -319,7 +327,7 @@ void loop() {
       outgoingString += "\"luminosity_4\":" + String(noise_avg_legal_max);
       outgoingString += "}";
       softwareSerial.println(outgoingString);
-      Serial.print("Sent Serial: ");
+      Serial.print("  Sent Serial: ");
       Serial.println(outgoingString);
       delay (500);
       while(softwareSerial.available()) {
@@ -331,14 +339,14 @@ void loop() {
         }
         serialbuffer[i] = '\0';
         if(serialbuffer[0]) {
-          Serial.print("Received Serial: ");
+          Serial.print("  Received Serial: ");
           Serial.println(serialbuffer);
           char *commaPos = strchr(serialbuffer, ','); // Find the comma position
           wifiConnected = (strncmp(serialbuffer, "true", 4) == 0); // Check if the start is "true"
           motionVibrations = atoi(commaPos + 1); // Convert the number part to an integer
-          Serial.print("wifiConnected: ");
+          Serial.print("  wifiConnected: ");
           Serial.println(wifiConnected);
-          Serial.print("motionVibrations: ");
+          Serial.print("  motionVibrations: ");
           Serial.println(motionVibrations);
         }
       }
@@ -349,31 +357,23 @@ void loop() {
     }  
     
     digitalWrite(Vext, LOW);
+    Serial.println("  starting microphone....");
     delay(100);
   
     // Low Noise Mode if two Noise Overage are under LowNoiseLevel 
     if (noise_avg < LowNoiseLevel + noiseDiffSleep && noise_avg_pre < LowNoiseLevel + noiseDiffSleep && indoor == false) {
       if (LORAWAN_CLASS == CLASS_A) {
         cycles -= icycles;
-          Serial.print("noise_avg: ");
-          Serial.println(noise_avg);
-          Serial.print("LowNoiseLevel: ");
-          Serial.println(LowNoiseLevel);
-          Serial.print("noiseDiffSleep: ");
-          Serial.println(noiseDiffSleep);
-          Serial.print("noise_avg_pre: ");
-          Serial.println(noise_avg_pre);
         digitalWrite(Vext, HIGH);
-        Serial.println("Switch OFF Microphone");
-        Serial.println("Sleep");
+        Serial.println("  Switch OFF Microphone");
+        Serial.println("  Sleep");
         digitalWrite(Pin_LED_Red, LOW);
         digitalWrite(Pin_LED_Green, LOW);
         delay(400);
         lowPowerSleep(Sleep4NoNoise); 
         digitalWrite(Vext, LOW);
-        Serial.println("Switch ON Microphone");
+        Serial.println("  Switch ON Microphone");
       }
-      CountStart = millis();
     } 
     
     noise_peak = 0;
@@ -382,6 +382,8 @@ void loop() {
     loops = 0;
     noise_avg_legal_max = 0;
     noise_avg_pre = noise_avg;
+
+    LegalStart = millis();
   }
 }
 
